@@ -1,7 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Backend;
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin;
+use Illuminate\Support\Facades\Auth;
+
+// use App\Http\Middleware\CheckRole;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,15 +19,18 @@ use App\Http\Controllers\Backend;
 |
 */
 
-Route::group(['middleware' => ['guest']], function(){
-    Route::get('/login', [Backend\AuthController::class,'login'])->name('login');
-    Route::get('/login', [Backend\AuthController::class,'login'])->name('auth.login.post');
-    
-});
+
 
 Route::group(['middleware' => ['auth']], function(){
    
-    Route::get('/', function () {
-        return view('welcome');
+   Route::middleware(['checkRole:1'])->group(function () {
+        // Route::get('/',[Admin\HomeController::class,'index'])->name('admin');
+        Route::get('/',[Admin\HomeController::class,'index'])->name('admin.index');
+        Route::get('/role',[Admin\RoleController::class,'role'])->name('admin.role');
+        Route::get('/role/showdata',[Admin\RoleController::class,'roleData'])->name('admin.role.data');
+        Route::get('/role/edit/{id}',[Admin\RoleController::class,'getEditRole'])->name('admin.role.editGet');
     });
+    
+    
 });
+

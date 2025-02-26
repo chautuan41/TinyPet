@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Fontend;
+use App\Http\Controllers\User;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,15 +16,21 @@ use App\Http\Controllers\Fontend;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Route::group(['middleware' => ['guest']], function(){
-    Route::get('/login', [Fontend\AuthController::class,'login'])->name('login');
-    
+    Route::get('/login', [AuthController::class,'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class,'login'])->name('login.post');
+    Route::get('/',[HomeController::class,'index'])->name('user.index');
+    Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 });
 
 Route::group(['middleware' => ['auth']], function(){
+    Route::middleware(['checkRole:2'])->group(function () {
+        
+        
+    });
+
     
-});
+ });
+
