@@ -181,7 +181,7 @@
                         // let stt = row.row_number;
                         // return `<div class="colorHeader">${stt}</div>`;
                         return `<td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.role_id}</h6>
+                                            <h6 class="fw-semibold mb-0">${row.id}</h6>
                                         </td>`;
                         // return `<div class="colorHeader">1</div>`;
                     },
@@ -220,7 +220,7 @@
                     class: 'center',
                     render: function(col, type, row) {
                         return (`
-                            <div class="fw-semibold mb-0">${row.updated_at ? row.updated_at : '-'}</div>
+                            <div class="fw-semibold mb-0">${row.updated_at ? moment(row.updated_at).format('DD/MM/YYYY H:mm') : '-'}</div>
                     `);
                     },
                     targets: 4
@@ -230,10 +230,10 @@
                     render: function(col, type, row) {
                         // let url = window.location.href;
                         // let param = new URL(url).search;
-                        iconDelete = `<a title="Xóa" class="ms-2" onClick="onDelete('${row.role_id}')" style="cursor: pointer;"><i class="fa-solid fa-trash-can"></i></a>`;
+                        iconDelete = `<a title="Xóa" class="ms-2" onClick="onDelete('${row.id}')" style="cursor: pointer;"><i class="fa-solid fa-trash-can"></i></a>`;
                         // if(user_type_number == 1 || personnel_auth == 1 || currentUserId == row.user_id){
                             // ${row.isEdit ? 'href="/curator/edit/'+row.user_id+param+'"' : 'class="disabledIcon"'}
-                        isEdit = `<a title="Sửa" class=""  style="cursor: pointer;" onClick="onEdit('${row.role_id}')"><i class="fa-solid fa-pen-to-square"></i></a>`;
+                        isEdit = `<a title="Sửa" class=""  style="cursor: pointer;" onClick="onEdit('${row.id}')"><i class="fa-solid fa-pen-to-square"></i></a>`;
                         // }
                         
                         return (`

@@ -21,16 +21,24 @@ class UserSeeder extends Seeder
                 'email' => 'john.doe@example.com',
                 'email_verified_at' => Carbon::now(),
                 'password' => bcrypt('123456'), // Mã hóa mật khẩu
-                'role' => 1, // Giả sử 1 là quyền admin
-               
+                'role_id' => 3, 
+                'status' => 1, 
             ],
             [
                 'name' => 'Jane Smith',
                 'email' => 'jane.smith@example.com',
                 'email_verified_at' => Carbon::now(),
                 'password' => bcrypt('123456'),
-                'role' => 2, // Giả sử 2 là quyền người dùng
-               
+                'role_id' => 2, 
+                'status' => 1,
+            ],
+            [
+                'name' => 'Admin',
+                'email' => 'admin123@adminpet.com',
+                'email_verified_at' => Carbon::now(),
+                'password' => bcrypt('123456'),
+                'role_id' => 1, 
+                'status' => 1,
             ],
         ]);
     }

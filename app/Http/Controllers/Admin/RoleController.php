@@ -15,7 +15,7 @@ class RoleController extends Controller
 
     public function roleData(Request $request){
        
-        $data=DB::table('tbl_role')->select(
+        $data=DB::table('roles')->select(
             '*',
             DB::raw('
                 CASE
@@ -49,10 +49,10 @@ class RoleController extends Controller
     }
 
     public function getEditRole($id, Request $request){
-        $data=DB::table('tbl_role')
-        ->where('role_id',  $id)
+        $data=DB::table('roles')
+        ->where('id',  $id)
         ->first();
-
+        
         return response()->json([
             'data' => $data,
             'success' => true

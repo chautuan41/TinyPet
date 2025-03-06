@@ -16,24 +16,42 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+       
         $validated = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
         ]);
-
+        
         if (Auth::attempt($validated)) {
-            if (Auth::user()->role == 1) {
+            if(Auth::user()->status == 1){
+                //ADMIN
+                if (Auth::user()->role_id == 1) {
+                    return response()->json([
+                        'success' => true,
+                        'url' => route('admin.index')
+                    ]);
+                }
+                //NHÂN VIÊN
+                if (Auth::user()->role_id == 2) {
+                    return response()->json([
+                        'success' => true,
+                        'url' => route('staff.index')
+                    ]);
+                }
+                //KHÁCH HÀNG
+                if (Auth::user()->role_id == 3) {
+                    return response()->json([
+                        'success' => true,
+                        'url' => route('user.index')
+                    ]);
+                }
+            }else {
+                Auth::logout();
                 return response()->json([
-                    'success' => true,
-                    'url' => route('admin.index')
+                    'success' => false, 
+                    'mess' => "Tài khoản của bạn đã bị khóa",
                 ]);
-            } 
-            if (Auth::user()->role == 2) {
-                return response()->json([
-                    'success' => true,
-                    'url' => route('user.index')
-                ]);
-            } 
+            }
         }else {
             return response()->json([
                 'success' => false, 
@@ -50,6 +68,6 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('admin.index');
+        return redirect()->route('user.index');
     }
 }

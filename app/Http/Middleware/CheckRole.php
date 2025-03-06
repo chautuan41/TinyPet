@@ -26,21 +26,20 @@ class CheckRole
         //     return redirect()->route('admin.index');
         //     // return view('welcom');
         // }
-        // // dd( Auth::user()->role);
+        
         
         
         
         if (Auth::check()) {
-            switch (Auth::user()->role) {
-                
+            switch (Auth::user()->role_id) {
                 case 2:
-                        if ( Auth::user()->role != $role) {
+                        if ( Auth::user()->role_id != $role) {
                             return redirect()->route('user.index');
                         }
                     break;
                 case 3:
-                        if ( Auth::user()->role != $role) {
-                            return redirect()->route('kh.index');
+                        if ( Auth::user()->role_id != $role) {
+                            return redirect()->route('user.index');
                         }
                     break;
                 default:
