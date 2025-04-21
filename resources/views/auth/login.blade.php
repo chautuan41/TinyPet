@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ config('app.name', 'Laravel') }}</title>
-  <link rel="shortcut icon" type="image/png" href="../backend/assets/images/logos/favicon.png" />
-  <link rel="stylesheet" href="../backend/assets/css/styles.min.css" />
+  <link rel="shortcut icon" type="image/png" href="{{asset('backend/assets/images/logos/favicon.png')}}" />
+  <link rel="stylesheet" href="{{asset('backend/assets/css/styles.min.css')}}" />
 </head>
 
 <body>
@@ -24,16 +24,17 @@
                   <p class="fs-4 mb-0 fw-bold">{{ config('app.name', 'Laravel') }}</p>
                 </a>
                 <p class="text-center">Thương hiệu Tinypet</p>
-                <form method="POST">
+                <form method="POST" id="loginForm">
                   @csrf
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Tài khoản</label>
-                    <input type="email" class="form-control" id="user_email">
+                    <input type="email" class="form-control" id="user_email" name="email" >
+                    
                   </div>
                   <div class="mb-4">
                     <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
-                    <input type="password" class="form-control" id="user_password">
+                    <input type="password" class="form-control" id="user_password" name="password" >
                   </div>
                   <div class="d-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
@@ -44,7 +45,7 @@
                     </div>
                     <a class="text-primary fw-bold" href="./index.html">Quên mật khẩu?</a>
                   </div>
-                  <button type="button" id='postLogin' class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Đăng nhập</button>
+                  <button type="button" id='postLogin' class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2" onclick="login(`{{route('login.post')}}`)">Đăng nhập</button>
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">Bạn muốn đăng ký {{ config('app.name', 'Laravel') }}?</p>
                     <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Đăng ký</a>
@@ -57,26 +58,21 @@
       </div>
     </div>
   </div>
-  <script src="../backend/assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../backend/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{asset('backend/assets/libs/jquery/dist/jquery.min.js')}}"></script>
+  <script src="{{asset('backend/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 <script>
-  $('#postLogin').on('click', function() {
-    let formData = new FormData();
-    formData.append('_token', $("input[name='_token']").val());
-    formData.append('email', $('#user_email').val());
-    formData.append('password', $('#user_password').val());
+  function login(url){
+    let formData = $('#loginForm').serialize();
       $.ajax({
-        url: `{{route('login.post')}}`,
+        url: url,
         type: 'POST',
         data: formData,
-        processData: false,
-        contentType: false,
         success: function(result) {
           if(result.success){
-            window.location.href = result.url;
+            window.location.replace(result.url);
           }
           else{
             Swal.fire({
@@ -84,9 +80,10 @@
               icon: "warning"
             });
           }
-        }
+        },
       })
-  });
+  }
+
 </script>
 
 </html>

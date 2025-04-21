@@ -17,18 +17,18 @@ use Illuminate\Support\Facades\Auth;
 */
 
 
+Route::get('/',[HomeController::class,'index'])->name('user.index');
+Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');
     Route::post('/login', [AuthController::class,'login'])->name('login.post');
-    Route::get('/logout', [AuthController::class,'logout'])->name('logout');
+   
 });
 
-Route::get('/',[HomeController::class,'index'])->name('user.index');
-Route::get('/logout', [AuthController::class,'logout'])->name('logout');
-
+//CUSTOMER
 Route::group(['middleware' => ['auth']], function(){
-    Route::middleware(['checkRole:2'])->group(function () {
+    Route::middleware(['checkRole:3'])->group(function () {
         
        
     });

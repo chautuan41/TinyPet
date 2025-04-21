@@ -22,15 +22,45 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::group(['middleware' => ['auth']], function(){
-   
    Route::middleware(['checkRole:1'])->group(function () {
-        // Route::get('/',[Admin\HomeController::class,'index'])->name('admin');
+        //ADMIN
         Route::get('/',[Admin\HomeController::class,'index'])->name('admin.index');
-        Route::get('/role',[Admin\RoleController::class,'role'])->name('admin.role');
-        Route::get('/role/showdata',[Admin\RoleController::class,'roleData'])->name('admin.role.data');
-        Route::get('/role/edit/{id}',[Admin\RoleController::class,'getEditRole'])->name('admin.role.editGet');
+
+        
     });
-    
-    
+
+    Route::middleware(['checkRole:2'])->group(function () {
+        
+       
+    });
 });
 
+//ROLE
+Route::get('/role',[Admin\RoleController::class,'role'])->name('admin.role');
+Route::get('/role/showdata',[Admin\RoleController::class,'data'])->name('admin.role.data');
+Route::get('/role/edit/{id}',[Admin\RoleController::class,'showEdit'])->name('admin.role.editGet');
+Route::post('/role/edit/{id}',[Admin\RoleController::class,'postEdit'])->name('admin.role.editPost');
+Route::post('/role/add',[Admin\RoleController::class,'add'])->name('admin.role.add');
+Route::get('/role/delete/{id}',[Admin\RoleController::class,'delete'])->name('admin.role.delete');
+
+//ACCOUNT
+Route::get('/account',[Admin\AccountController::class,'account'])->name('admin.account');
+Route::get('/account/showdata',[Admin\AccountController::class,'data'])->name('admin.account.data');
+Route::get('/account/edit/{id}',[Admin\AccountController::class,'showEdit'])->name('admin.account.editGet');
+Route::post('/account/edit/{id}',[Admin\AccountController::class,'postEdit'])->name('admin.account.editPost');
+Route::get('/account/view/{id}',[Admin\AccountController::class,'view'])->name('admin.account.view');
+Route::get('/account/delete/{id}',[Admin\AccountController::class,'delete'])->name('admin.account.delete');
+//PRODUCT
+Route::get('/product',[Admin\ProductController::class,'product'])->name('admin.product');
+Route::get('/product/showdata',[Admin\ProductController::class,'productData'])->name('admin.product.data');
+Route::get('/product/edit/{id}',[Admin\ProductController::class,'getEditProduct'])->name('admin.product.editGet');
+
+//SUPPLIER
+Route::get('/supplier',[Admin\SupplierController::class,'supplier'])->name('admin.supplier');
+Route::get('/supplier/showdata',[Admin\SupplierController::class,'supplierData'])->name('admin.supplier.data');
+Route::get('/rosupplierle/edit/{id}',[Admin\SupplierController::class,'getEditSupplier'])->name('admin.supplier.editGet');
+
+//SHIPPING
+Route::get('/shipping',[Admin\RoleController::class,'shipping'])->name('admin.shipping');
+Route::get('/shipping/showdata',[Admin\RoleController::class,'shippingData'])->name('admin.shipping.data');
+Route::get('/shipping/edit/{id}',[Admin\RoleController::class,'getEditShipping'])->name('admin.shipping.editGet');

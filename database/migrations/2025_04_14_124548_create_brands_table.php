@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Carbon\Carbon;
 
 return new class extends Migration
 {
@@ -12,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->string('product_name');
-            $table->text('description');
-            $table->string('avatar')->nullable();
-            $table->integer('category_id');
-            $table->integer('product_type_id');
-            $table->integer('brand_id');
+            $table->string('brand_name');
             $table->integer('status');
             $table->timestamps();
         });
@@ -30,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('brands');
     }
 };

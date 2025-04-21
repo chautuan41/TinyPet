@@ -22,7 +22,9 @@ class UserSeeder extends Seeder
                 'email_verified_at' => Carbon::now(),
                 'password' => bcrypt('123456'), // Mã hóa mật khẩu
                 'role_id' => 3, 
-                'status' => 1, 
+                'status' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Jane Smith',
@@ -31,6 +33,8 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('123456'),
                 'role_id' => 2, 
                 'status' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Admin',
@@ -39,6 +43,8 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('123456'),
                 'role_id' => 1, 
                 'status' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ]);
     }

@@ -8,15 +8,17 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     //
+   
+
     public function showLogin()
     {
-
+        
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
-       
+        
         $validated = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
