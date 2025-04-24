@@ -26,34 +26,40 @@ Route::group(['middleware' => ['auth']], function(){
         //ADMIN
         Route::get('/',[Admin\HomeController::class,'index'])->name('admin.index');
 
+        //ROLE
+        Route::get('/role',[Admin\RoleController::class,'role'])->name('admin.role');
+        Route::get('/role/showdata',[Admin\RoleController::class,'data'])->name('admin.role.data');
+        Route::get('/role/edit/{id}',[Admin\RoleController::class,'showEdit'])->name('admin.role.editGet');
+        Route::post('/role/edit/{id}',[Admin\RoleController::class,'postEdit'])->name('admin.role.editPost');
+        Route::post('/role/add',[Admin\RoleController::class,'add'])->name('admin.role.add');
+        Route::get('/role/delete/{id}',[Admin\RoleController::class,'delete'])->name('admin.role.delete');
+
+        //ACCOUNT
+        Route::get('/account',[Admin\AccountController::class,'account'])->name('admin.account');
+        Route::get('/account/showdata',[Admin\AccountController::class,'data'])->name('admin.account.data');
+        Route::get('/account/edit/{id}',[Admin\AccountController::class,'showEdit'])->name('admin.account.editGet');
+        Route::post('/account/edit/{id}',[Admin\AccountController::class,'postEdit'])->name('admin.account.editPost');
+        Route::get('/account/view/{id}',[Admin\AccountController::class,'view'])->name('admin.account.view');
+        Route::get('/account/delete/{id}',[Admin\AccountController::class,'delete'])->name('admin.account.delete');
+
+        
         
     });
 
     Route::middleware(['checkRole:2'])->group(function () {
-        
        
     });
 });
 
-//ROLE
-Route::get('/role',[Admin\RoleController::class,'role'])->name('admin.role');
-Route::get('/role/showdata',[Admin\RoleController::class,'data'])->name('admin.role.data');
-Route::get('/role/edit/{id}',[Admin\RoleController::class,'showEdit'])->name('admin.role.editGet');
-Route::post('/role/edit/{id}',[Admin\RoleController::class,'postEdit'])->name('admin.role.editPost');
-Route::post('/role/add',[Admin\RoleController::class,'add'])->name('admin.role.add');
-Route::get('/role/delete/{id}',[Admin\RoleController::class,'delete'])->name('admin.role.delete');
 
-//ACCOUNT
-Route::get('/account',[Admin\AccountController::class,'account'])->name('admin.account');
-Route::get('/account/showdata',[Admin\AccountController::class,'data'])->name('admin.account.data');
-Route::get('/account/edit/{id}',[Admin\AccountController::class,'showEdit'])->name('admin.account.editGet');
-Route::post('/account/edit/{id}',[Admin\AccountController::class,'postEdit'])->name('admin.account.editPost');
-Route::get('/account/view/{id}',[Admin\AccountController::class,'view'])->name('admin.account.view');
-Route::get('/account/delete/{id}',[Admin\AccountController::class,'delete'])->name('admin.account.delete');
+
 //PRODUCT
 Route::get('/product',[Admin\ProductController::class,'product'])->name('admin.product');
 Route::get('/product/showdata',[Admin\ProductController::class,'productData'])->name('admin.product.data');
 Route::get('/product/edit/{id}',[Admin\ProductController::class,'getEditProduct'])->name('admin.product.editGet');
+Route::post('/product/edit/{id}',[Admin\ProductController::class,'postEdit'])->name('admin.product.editPost');
+Route::get('/product/view/{id}',[Admin\ProductController::class,'view'])->name('admin.product.view');
+Route::get('/product/delete/{id}',[Admin\ProductController::class,'delete'])->name('admin.product.delete');
 
 //SUPPLIER
 Route::get('/supplier',[Admin\SupplierController::class,'supplier'])->name('admin.supplier');

@@ -10,11 +10,10 @@ class ProductController extends Controller
 {
     //
     public function product(){
-        
-
-
-      
-    return view('backend.pages.products.product');
+        $dataC=DB::table('categories')->get();
+        $dataPT=DB::table('product_types')->get();
+        $dataB=DB::table('brands')->get();
+        return view('backend.pages.products.product',compact('dataC','dataPT','dataB'));
         
     }
 
@@ -37,16 +36,27 @@ class ProductController extends Controller
                 case 'status':
                     $data=$data->where('products.status', $request->searchInput);
                     break;
-                case 'category_id':
-                    $data=$data->where('category_id', $request->searchInput);
+                case 'category':
+                    $data=$data->where('products.category_id', $request->searchInput);
                     break;
-                    
+                case 'brand':
+                    $data=$data->where('products.brand_id', $request->searchInput);
+                    break;
+                case 'product_type':
+                    $data=$data->where('products.product_type_id', $request->searchInput);
+                    break;
+                case 'id':
+                    $data=$data->where('products.id', $request->searchInput);
+                    break;
+                case 'product_name':
+                    $data=$data->where('products.product_name','like', '%'.$request->searchInput.'%');
+                    break;
                 default:
+                    break;
                 break;
             };
         };
         $data=$data->get();
-        
         $totalRecords=count($data);
         return response()->json([
             'data' => $data,

@@ -155,7 +155,10 @@ class RoleController extends Controller
             // Cập nhật dữ liệu
             DB::table('roles')
                 ->where('id', $id)
-                ->delete();
+                ->update([
+                    'status' => 3,
+                    'updated_at' => now() // Cập nhật thời gian sửa
+                ]);
     
             return response()->json([
                 'success' => true,

@@ -78,14 +78,11 @@
 
 <script>
     $(document).ready(function() {
-        //Load data
-        render();
         //Load url
-        urlLoad();
-       
-        
+        urlLoad();        
     });
-
+    //Load data
+    render();
     function render(data = '') {
         arrID = [];
 

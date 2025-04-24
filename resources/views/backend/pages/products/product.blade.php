@@ -18,9 +18,9 @@
                                             <option value="" disabled selected>Lựa chọn tìm kiếm</option>
                                             <option value="id">Mã Sản Phẩm</option>
                                             <option value="product_name">Tên Sản Phẩm</option>
-                                            <option value="price">Giá</option>
-                                            <option value="quantity">Số Lượng</option>
-                                            <option value="category_id">Loại sản phẩm</option>
+                                            <option value="product_type">Loại sản phẩm</option>
+                                            <option value="brand">Thương hiệu</option>
+                                            <option value="category">Danh mục</option>
                                             <option value="status">Trạng Thái</option>
                                         </select>
                                         <div id="contentSearch" class="form-control form-control-sm">
@@ -89,8 +89,12 @@
 </div>
 
 <script>
-    render();
+    $(document).ready(function() {    
 
+       urlLoad();
+    });
+
+    render();
     function render(data = '') {
         arrID = [];
 
@@ -238,23 +242,54 @@
         });
     };
 
-    function btnSearch() {
-        search();
-    };
+    </script>
 
-    $(document).ready(function() {
-        urlLoad()
+<!-- SEARCH-->
+<script>
+    //Lựa chọn tìm kiếm
+    $('#searchSelect').on('change', function() {
+        
+        let searchSelect = $(this).val();
+        $contentSearch = $(this).parent().find('#contentSearch');
+        const selectTemplate = (options) => `
+            <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Chọn điều kiện">
+                ${options}
+            </select>
+        `;
+        switch (searchSelect) { 
+            case 'status':
+                $contentSearch.html(selectTemplate(`
+                    <option value="1">Hoạt động</option>
+                    <option value="2">Ngưng hoạt động</option>
+                `));
+                break;
+            case 'brand':
+                const brandOptions = @json($dataB).map(brand => `<option value="${brand.id}">${brand.brand_name}</option>`).join('');
+                $contentSearch.html(selectTemplate(brandOptions));
+                break;
 
+            case 'category':
+                const categoryOptions = @json($dataC).map(category => `<option value="${category.id}">${category.category_name}</option>`).join('');
+                $contentSearch.html(selectTemplate(categoryOptions));
+                break;
+            case 'product_type':
+                const productTypeOptions = @json($dataPT).map(producType => `<option value="${producType.id}">${producType.product_type_name}</option>`).join('');
+                $contentSearch.html(selectTemplate(productTypeOptions));
+                break;
+            default:
+                $contentSearch.html(`
+                    <input type="text" name="searchInput" class="form-control form-control-sm" id="searchInput">
+                `);
+                $contentSearch.find('#searchInput').focus();
+                break;
+        }   
+        
     });
 
-
-
-
-
-    function search() {
+    // Button search
+    function btnSearch() {
         let formData = new FormData($('#searchForm')[0]);
         var object = {};
-
         formData.forEach(function(value, key) {
             object[key] = value;
             // let text = $(`#${key} option:selected`).text();
@@ -267,47 +302,7 @@
         render(object);
     };
 
-    $('#searchSelect').on('change', function() {
-        let searchSelect = $(this).val();
-        $(this).parent().find('#contentSearch').html(`
-        <input type="text" name="searchInput" class="form-control form-control-sm" id="searchInput">`);
-        if (searchSelect == 'status') {
-            $(this).parent().find('#contentSearch').html(`
-                <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Điều kiện tìm kiếm">
-                    <option value="1">Hoạt động</option>
-                    <option value="2">Ngưng hoạt động</option>
-                </select>
-            `);
-        };
-        
-    });
-
-
-
-    function onEdit(data) {
-        $('#editRoleModal').modal('show');
-        $.ajax({
-            url: `/admin/role/edit/${data}`,
-            type: 'GET',
-            processData: false,
-            contentType: false,
-            success: function(result) {
-                if (result.success) {
-                    $('#userInputModal').val(result.data.role_name);
-                    $('#searchSelectModal').val(result.data.status).trigger('change');
-                } else {
-                    Swal.fire({
-                        title: result.mess,
-                        icon: "warning"
-                    });
-                }
-            }
-        })
-    }
-
-    
-
-
+    //Search url 
     function urlLoad() {
         let url = window.location.href;
         let param = new URL(url).searchParams.get("search");
@@ -315,8 +310,162 @@
             data = JSON.parse(decodeURIComponent(atob(param)));
             $('#searchSelect').val(data.searchSelect).trigger('change');
             $('#searchInput').val(data.searchInput).trigger('change');
-            search();
+            btnSearch();
         }
+    }
+</script>
+
+<!-- MODAL EDIT-->
+<script>
+    const editGetBaseUrl = @json(route('admin.account.editGet', ['id' => 'ID_PLACEHOLDER']));
+    const editPostBaseUrl = @json(route('admin.account.editPost', ['id' => 'ID_PLACEHOLDER']));
+    function createDynamicInputs(data) {
+        // Clear previous inputs if any
+        $('#dynamicInputs').empty();
+        // Duyệt qua mảng dữ liệu và tạo các input tương ứng
+        data.forEach(function(item, index) {
+            // Tạo các input động cho mỗi phần tử trong data
+            if(item.select == "select"){
+                if (item.name == "status") {
+                    var selected1 = item.value == 1 ? "selected" : "";
+                    var selected2 = item.value == 2 ? "selected" : "";
+                    var inputHTML = `
+                        <div class="form-group">
+                            <label for="input_${index}">${item.label}</label>
+                            <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
+                                <option value="1" ${selected1}>Hoạt động</option>
+                                <option value="2" ${selected2}>Ngưng hoạt động</option>
+                            </select>
+                        </div>
+                    `;
+                }
+                if (item.name == "role_id"){
+                    
+                    let options = dataSelect.map(role => {
+                    let selected = role.id == item.value ? 'selected' : '';
+                        return `<option value="${role.id}" ${selected}>${role.role_name}</option>`;
+                    }).join('');
+                    var inputHTML = `
+                        <div class="form-group">
+                                <label for="input_${index}">${item.label}</label>
+                                <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
+                                    ${options}
+                                </select>
+                            </div>
+                        `
+                }
+                
+            } else {
+                var inputHTML = `
+                    <div class="form-group">
+                        <label for="input_${index}">${item.label}</label>
+                        <input type="${item.type}" class="form-control" id="input_${index}" name="${item.name}" value="${item.value}" placeholder="${item.placeholder}" ${item.disabled}>
+                    </div>
+                `;
+            }
+            // Append input vào form
+            $('#dynamicInputs').append(inputHTML);
+        });
+    }
+
+    let currentEditId = null;
+    function onEdit(id) {
+        currentEditId = id;
+        let editUrl = editGetBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        $('#saveModal').show();
+        $('#formModal')[0].reset();
+        $('#modalForm').modal('show');
+        $('#saveModal').attr('onclick', 'saveModalEdit()');
+        $.ajax({
+            url: editUrl,
+            type: 'GET',
+            processData: false,
+            contentType: false,
+            success: function(result) {
+
+                if (result.success) {
+                    $('#inputTitle').text("Chỉnh sửa " + result.title);
+                    // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
+                    var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
+                    createDynamicInputs(dynamicData);
+                }
+            }
+        });
+    }
+
+    function saveModalEdit(){
+        let formData = $('#formModal').serialize();
+        let editUrl = editPostBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        $.ajax({
+            url: editUrl,
+            type: 'POST',
+            data: formData,
+            success: function(result) {
+            if(result.success){
+                window.location.replace(result.url);
+            }
+            else{
+                Swal.fire({
+                title: result.mess,
+                icon: "warning"
+                });
+            }
+            },
+        })
+    }
+</script>
+
+<!-- Delete -->
+<script>
+    const deleteBaseUrl = @json(route('admin.account.delete', ['id' => 'ID_PLACEHOLDER']));
+    function onDelete(id){
+        currentEditId = id;
+        let deleteUrl = deleteBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        $.ajax({
+            url: deleteUrl,
+            type: 'GET',
+            processData: false,
+            contentType: false,
+            success: function(result) {
+            if(result.success){
+                window.location.replace(result.url);
+            }
+            else{
+                Swal.fire({
+                title: result.mess,
+                icon: "warning"
+                });
+            }
+            },
+        })
+    }
+</script>  
+    
+<!-- MODAL VIEW-->
+<script>
+    const viewBaseUrl = @json(route('admin.product.view', ['id' => 'ID_PLACEHOLDER']));
+    function onView(id) {
+        currentEditId = id;
+        let viewUrl = viewBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        $('#saveModal').hide();
+        $('#formModal')[0].reset();
+        $('#modalForm').modal('show');
+        
+        $.ajax({
+            url: viewUrl,
+            type: 'GET',
+            processData: false,
+            contentType: false,
+            success: function(result) {
+
+                if (result.success) {
+                    $('#inputTitle').text("Chi Tiết " + result.title);
+                    // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
+                    var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
+                    createDynamicInputs(dynamicData);
+                }
+            }
+        });
     }
 </script>
 @endsection

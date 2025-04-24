@@ -15,7 +15,7 @@
                                 <div class="col-md-6">
                                     <div class="input-group">
                                         <select id="searchSelect" name="searchSelect" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm">
-                                            <option>Lựa chọn tìm kiếm</option>
+                                            <option disabled selected>Lựa chọn tìm kiếm</option>
                                             <option value="email">Email</option>
                                             <option value="role_id">Vai trò</option>
                                             <option value="status">Trạng thái</option>
@@ -79,15 +79,14 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        urlLoad()
-        render();
-
-    });
     
+    $(document).ready(function() {    
+       
+        urlLoad();
+    });
+    render();
     function render(data = '') {
         arrID = [];
-
         let datatable = $('#account').DataTable({
             processing: true,
             serverSide: true,
@@ -121,7 +120,7 @@
                         // let stt = row.row_number;
                         // return `<div class="colorHeader">${stt}</div>`;
                         return `<td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.id}</h6>
+                                            <h6 class="fw-semibold mb-0">${row.idA}</h6>
                                         </td>`;
                         // return `<div class="colorHeader">1</div>`;
                     },
@@ -182,11 +181,11 @@
                     render: function(col, type, row) {
                         // let url = window.location.href;
                         // let param = new URL(url).search;
-                        iconDelete = `<a title="Xóa" class="ms-2" onClick="onDelete('${row.id}')" style="cursor: pointer;"><i class="fa-solid fa-trash-can"></i></a>`;
+                        iconDelete = `<a title="Xóa" class="ms-2" onClick="onDelete('${row.idA}')" style="cursor: pointer;"><i class="fa-regular fa-circle-xmark"></i></a>`;
                         // if(user_type_number == 1 || personnel_auth == 1 || currentUserId == row.user_id){
                         // ${row.isEdit ? 'href="/curator/edit/'+row.user_id+param+'"' : 'class="disabledIcon"'}
-                        isEdit = `<a title="Sửa" class="ms-2" style="cursor: pointer;" onClick="onEdit('${row.id}')"><i class="fa-solid fa-pen-to-square"></i></a>`;
-                        isView = `<a title="Xem" class=""  style="cursor: pointer;" onClick="onView('${row.id}')"><i class="fa-solid fa-eye"></i></a>`;
+                        isEdit = `<a title="Sửa" class="ms-2" style="cursor: pointer;" onClick="onEdit('${row.idA}')"><i class="fa-solid fa-pen-to-square"></i></a>`;
+                        isView = `<a title="Xem" class=""  style="cursor: pointer;" onClick="onView('${row.idA}')"><i class="fa-solid fa-eye"></i></a>`;
                         // }
 
                         return (`
@@ -220,26 +219,40 @@
         let searchSelect = $(this).val();
         $(this).parent().find('#contentSearch').html(`
         <input type="text" name="searchInput" class="form-control form-control-sm" id="searchInput">`);
+        $('#searchInput').focus();
         if (searchSelect == 'status') {
-            $(this).parent().find('#contentSearch').html(`
-                <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Điều kiện tìm kiếm">
-                    <option value="1">Hoạt động</option>
-                    <option value="2">Ngưng hoạt động</option>
-                </select>
-            `);
+            const currentUser = {
+                role_id: @json(Auth::user()->role_id)
+            };
+            if(currentUser.role_id == 1){
+                $(this).parent().find('#contentSearch').html(`
+                    <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Điều kiện tìm kiếm">
+                        <option value="1">Hoạt động</option>
+                        <option value="2">Ngưng hoạt động</option>
+                        <option value="3">Đã bị khóa</option>
+                    </select>
+               `);
+            }else {
+                $(this).parent().find('#contentSearch').html(`
+                    <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Điều kiện tìm kiếm">
+                        <option value="1">Hoạt động</option>
+                        <option value="2">Ngưng hoạt động</option>
+                    </select>
+                `);
+            };
+            
         };  
         if (searchSelect == 'role_id') {
-        roles = @json($dataRoles);
-        let options = roles.map(role => {
-            return `<option value="${role.id}">${role.role_name}</option>`;
-        }).join('');
-
-        $(this).parent().find('#contentSearch').html(`
-            <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Chọn vai trò">
-                ${options}
-            </select>
-        `);
-    }
+            roles = @json($dataRoles);
+            let options = roles.filter(role => role.id != 1).map(role => {
+                return `<option value="${role.id}">${role.role_name}</option>`;
+            }).join('');
+            $(this).parent().find('#contentSearch').html(`
+                <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Chọn vai trò">
+                    ${options}
+                </select>
+            `);
+        }
     });
 
     // Button search
@@ -271,11 +284,13 @@
     }
 </script>
 
-<!-- MODAL EDIT-->
+
 <script>
+    // <!-- MODAL EDIT-->
     const editGetBaseUrl = @json(route('admin.account.editGet', ['id' => 'ID_PLACEHOLDER']));
     const editPostBaseUrl = @json(route('admin.account.editPost', ['id' => 'ID_PLACEHOLDER']));
-    function createDynamicInputs(data) {
+    function createDynamicInputs(data, method) {
+        
         // Clear previous inputs if any
         $('#dynamicInputs').empty();
         // Duyệt qua mảng dữ liệu và tạo các input tương ứng
@@ -285,22 +300,25 @@
                 if (item.name == "status") {
                     var selected1 = item.value == 1 ? "selected" : "";
                     var selected2 = item.value == 2 ? "selected" : "";
+                    var selected3 = item.value == 3 ? "selected" : "";
                     var inputHTML = `
                         <div class="form-group">
                             <label for="input_${index}">${item.label}</label>
                             <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
                                 <option value="1" ${selected1}>Hoạt động</option>
                                 <option value="2" ${selected2}>Ngưng hoạt động</option>
+                                <option value="3" ${selected3}>Đã bị khóa</option>
                             </select>
                         </div>
                     `;
                 }
                 if (item.name == "role_id"){
-                    dataSelect = @json($dataRoles);
-                    let options = dataSelect.map(role => {
-                    let selected = role.id == item.value ? 'selected' : '';
-                        return `<option value="${role.id}" ${selected}>${role.role_name}</option>`;
-                    }).join('');
+                    const dataSelect = @json($dataRoles);
+                    
+                    let options = dataSelect.filter(role => role.id != 1).map(role => {
+                            let selected = role.id == item.value ? 'selected' : '';
+                            return `<option value="${role.id}" ${selected}>${role.role_name}</option>`;
+                        }).join('');
                     var inputHTML = `
                         <div class="form-group">
                                 <label for="input_${index}">${item.label}</label>
@@ -329,22 +347,18 @@
         currentEditId = id;
         let editUrl = editGetBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $('#saveModal').show();
-        $('#formModal')[0].reset();
         $('#modalForm').modal('show');
-        $('#saveModal').attr('onclick', 'saveModalEdit()');
-        
         $.ajax({
             url: editUrl,
             type: 'GET',
             processData: false,
             contentType: false,
             success: function(result) {
-
                 if (result.success) {
                     $('#inputTitle').text("Chỉnh sửa " + result.title);
                     // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
                     var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
-                    createDynamicInputs(dynamicData);
+                    createDynamicInputs(dynamicData,1);
                 }
             }
         });
@@ -353,62 +367,36 @@
     function saveModalEdit(){
         let formData = $('#formModal').serialize();
         let editUrl = editPostBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
-        
         $.ajax({
             url: editUrl,
             type: 'POST',
             data: formData,
             success: function(result) {
-            if(result.success){
-                window.location.replace(result.url);
-            }
-            else{
-                Swal.fire({
-                title: result.mess,
-                icon: "warning"
-                });
-            }
+                if(result.success){
+                    window.location.replace(result.url);
+                }
+                else{
+                    Swal.fire({
+                        title: result.mess,
+                        icon: "warning"
+                    });
+                }
             },
         })
     }
+    // 
+    
 </script>
 
-<!-- Delete -->
-<script>
-    const deleteBaseUrl = @json(route('admin.account.delete', ['id' => 'ID_PLACEHOLDER']));
-    function onDelete(id){
-        currentEditId = id;
-        let deleteUrl = deleteBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
-        $.ajax({
-            url: deleteUrl,
-            type: 'GET',
-            processData: false,
-            contentType: false,
-            success: function(result) {
-            if(result.success){
-                window.location.replace(result.url);
-            }
-            else{
-                Swal.fire({
-                title: result.mess,
-                icon: "warning"
-                });
-            }
-            },
-        })
-    }
-</script>  
-    
 <!-- MODAL VIEW-->
 <script>
     const viewBaseUrl = @json(route('admin.account.view', ['id' => 'ID_PLACEHOLDER']));
     function onView(id) {
+        console.log(id);
         currentEditId = id;
         let viewUrl = viewBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $('#saveModal').hide();
-        $('#formModal')[0].reset();
         $('#modalForm').modal('show');
-        
         $.ajax({
             url: viewUrl,
             type: 'GET',
@@ -420,10 +408,54 @@
                     $('#inputTitle').text("Chi Tiết " + result.title);
                     // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
                     var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
-                    createDynamicInputs(dynamicData);
+                    createDynamicInputs(dynamicData,2);
                 }
             }
         });
     }
 </script>
+
+<!-- Delete -->
+<script>
+    const deleteBaseUrl = @json(route('admin.account.delete', ['id' => 'ID_PLACEHOLDER']));
+
+    function onDelete(id) {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn khoá?',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Khóa',
+            cancelButtonText: 'Huỷ'
+        }).then((result) => {
+                if (result.value) { 
+                    currentEditId = id;
+                    deleteUrl = deleteBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'GET',
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                title: 'Đã Khoá!',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                                }).then(() => {
+                                        location.reload();
+                                    });
+                            } else {
+                                Swal.fire({
+                                    title: 'Khoá thất bại!',
+                                    icon: "error"
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+    }
+</script>
+
 @endsection
