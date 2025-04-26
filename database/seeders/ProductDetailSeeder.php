@@ -34,7 +34,7 @@ class ProductDetailSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
+            [ 
                 'product_id' => 3,
                 'size' => 'L',
                 'price' => 200,

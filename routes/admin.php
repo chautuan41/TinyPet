@@ -56,10 +56,11 @@ Route::group(['middleware' => ['auth']], function(){
 //PRODUCT
 Route::get('/product',[Admin\ProductController::class,'product'])->name('admin.product');
 Route::get('/product/showdata',[Admin\ProductController::class,'productData'])->name('admin.product.data');
-Route::get('/product/edit/{id}',[Admin\ProductController::class,'getEditProduct'])->name('admin.product.editGet');
+Route::get('/product/edit/{id}',[Admin\ProductController::class,'showEdit'])->name('admin.product.editGet');
 Route::post('/product/edit/{id}',[Admin\ProductController::class,'postEdit'])->name('admin.product.editPost');
 Route::get('/product/view/{id}',[Admin\ProductController::class,'view'])->name('admin.product.view');
 Route::get('/product/delete/{id}',[Admin\ProductController::class,'delete'])->name('admin.product.delete');
+Route::post('/product/add',[Admin\ProductController::class,'add'])->name('admin.product.add');
 
 //SUPPLIER
 Route::get('/supplier',[Admin\SupplierController::class,'supplier'])->name('admin.supplier');

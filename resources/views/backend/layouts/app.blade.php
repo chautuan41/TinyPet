@@ -23,7 +23,9 @@
   <script src="../backend/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
   <script src="../backend/assets/libs/simplebar/dist/simplebar.js"></script>
   <script src="../backend/assets/js/dashboard.js"></script> -->
-
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  
   <link href="{{ asset('backend/plugins/multiple-select/multiple-select.css') }}" rel="stylesheet" />
   <!-- <link href="{{ asset('backend/assets/plugins/parsley/parsley.css') }}" rel="stylesheet" /> -->
   <link href="{{ asset('backend/plugins/sweetalerts/sweetalert2.min.css') }}" rel="stylesheet" />

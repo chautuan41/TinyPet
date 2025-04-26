@@ -165,10 +165,27 @@
                 {
                     class: 'center',
                     render: function(col, type, row) {
+                        let option = "";
+                        let status = "";
+                        switch (row.statusCustom) {
+                            case 1:
+                                status = "Đang hoạt động";
+                                option = `mb-0 badge bg-success rounded-3 fw-semibold`;
+                                break;
+                            case 2:
+                                status = "Ngưng hoạt động";
+                                option = `mb-0 badge bg-warning rounded-3 fw-semibold`;
+                                break;
+                            case 3:
+                                status = "Đã bị khóa";
+                                option = `mb-0 badge bg-danger rounded-3 fw-semibold`;
+                                break;
+                        };
+
                         return (`
-                            <td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.statusCustom}</h6>
-                                        </td>
+                        <td class="border-bottom-0">
+                                        <h6 class="${option}">${status}</h6>
+                                    </td>
                         `);
                     },
                     targets: 4

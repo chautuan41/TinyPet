@@ -1,44 +1,46 @@
 @extends('backend.layouts.app')
 
 @section('content')
+
+@include('backend.pages.products.detail')
 @include('backend.components.modal')
 <div class="container-fluid">
     <!--  Row 1 -->
     <div class="row">
         <div class="col-12">
-            <div class="card w-100">
+            <div class="card">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-semibold mb-4">Bảng sản phẩm</h5>
+                    <h5 class="card-title fw-semibold mb-4">Bảng Sản Phẩm</h5>
                     <div class="form-group">
                         <form id="searchForm">
                             <div class="row justify-content-end">
                                 <div class="col-md-6">
                                     <div class="input-group">
-                                        <select id="searchSelect" name="searchSelect" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm">
-                                            <option value="" disabled selected>Lựa chọn tìm kiếm</option>
+                                        <select id="searchSelect" name="searchSelect" class="form-control form-control-sm form-select   " data-placeholder="Điều kiện tìm kiếm">
+                                            <option value="" disabled selected>Lựa Chọn Tìm Kiếm</option>
                                             <option value="id">Mã Sản Phẩm</option>
                                             <option value="product_name">Tên Sản Phẩm</option>
-                                            <option value="product_type">Loại sản phẩm</option>
-                                            <option value="brand">Thương hiệu</option>
-                                            <option value="category">Danh mục</option>
+                                            <option value="product_type">Loại Sản Phẩm</option>
+                                            <option value="brand">Thương Hiệu</option>
+                                            <option value="category">Danh Mục</option>
                                             <option value="status">Trạng Thái</option>
                                         </select>
                                         <div id="contentSearch" class="form-control form-control-sm">
-                                                
+
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="col-md-2">
                                     <button class="btn btn-primary light"
-                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm kiếm</button>
+                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm Kiếm</button>
                                 </div>
                             </div>
                         </form>
                         <button class="btn btn-secondary light "
-                        title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm vai trò</button>
-                        
-                    <hr>
+                            title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm Sản Phẩm Mới</button>
+
+                        <hr>
                     </div>
                     <div class="table">
                         <table class="table text-nowrap mb-0 align-middle" id="product">
@@ -89,12 +91,13 @@
 </div>
 
 <script>
-    $(document).ready(function() {    
+    $(document).ready(function() {
 
-       urlLoad();
+        urlLoad();
     });
 
     render();
+
     function render(data = '') {
         arrID = [];
 
@@ -142,11 +145,8 @@
                     render: function(col, type, row) {
                         return (`
                         <td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.product_name.length > 20 ? row.product_name.substring(0, 20) + "..." : row.product_name}</h6>
+                                            <h6 class="fw-semibold mb-0">${row.product_name.length > 20 ? row.product_name.substring(0, 18) + ".." : row.product_name}</h6>
                                         </td>
-                        
-                                           
-                                        
                     `);
                     },
                     targets: 1
@@ -156,7 +156,7 @@
                     render: function(col, type, row) {
                         return (`
                         <td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.description.length > 20 ? row.description.substring(0, 20) + "..." : row.description}</h6>
+                                            <h6 class="fw-semibold mb-0">${row.description.length > 20 ? row.description.substring(0, 18) + ".." : row.description}</h6>
                                         </td>
 
                         `);
@@ -199,11 +199,28 @@
                 {
                     class: 'center',
                     render: function(col, type, row) {
+                        let option = "";
+                        let status = "";
+                        switch (row.statusCustom) {
+                            case 1:
+                                status = "Đang hoạt động";
+                                option = `mb-0 badge bg-success rounded-3 fw-semibold`;
+                                break;
+                            case 2:
+                                status = "Ngưng hoạt động";
+                                option = `mb-0 badge bg-warning rounded-3 fw-semibold`;
+                                break;
+                            case 3:
+                                status = "Đã bị khóa";
+                                option = `mb-0 badge bg-danger rounded-3 fw-semibold`;
+                                break;
+                        };
+
                         return (`
-                            <td class="border-bottom-0">
-                                            <h6 class="fw-semibold mb-0">${row.statusCustom}</h6>
-                                        </td>
-                    `);
+                        <td class="border-bottom-0">
+                                        <h6 class="${option}">${status}</h6>
+                                    </td>
+                        `);
                     },
                     targets: 6
                 },
@@ -241,22 +258,21 @@
             }
         });
     };
-
-    </script>
+</script>
 
 <!-- SEARCH-->
 <script>
     //Lựa chọn tìm kiếm
     $('#searchSelect').on('change', function() {
-        
+
         let searchSelect = $(this).val();
         $contentSearch = $(this).parent().find('#contentSearch');
         const selectTemplate = (options) => `
-            <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select" data-placeholder="Chọn điều kiện">
+            <select id="searchInput" name="searchInput" class="form-control form-control-sm form-select dropdown-scroll" data-placeholder="Chọn điều kiện">
                 ${options}
             </select>
         `;
-        switch (searchSelect) { 
+        switch (searchSelect) {
             case 'status':
                 $contentSearch.html(selectTemplate(`
                     <option value="1">Hoạt động</option>
@@ -282,8 +298,8 @@
                 `);
                 $contentSearch.find('#searchInput').focus();
                 break;
-        }   
-        
+        }
+
     });
 
     // Button search
@@ -317,58 +333,72 @@
 
 <!-- MODAL EDIT-->
 <script>
-    const editGetBaseUrl = @json(route('admin.account.editGet', ['id' => 'ID_PLACEHOLDER']));
-    const editPostBaseUrl = @json(route('admin.account.editPost', ['id' => 'ID_PLACEHOLDER']));
+    const editGetBaseUrl = @json(route('admin.product.editGet', ['id' => 'ID_PLACEHOLDER']));
+    const editPostBaseUrl = @json(route('admin.product.editPost', ['id' => 'ID_PLACEHOLDER']));
+
     function createDynamicInputs(data) {
-        // Clear previous inputs if any
         $('#dynamicInputs').empty();
-        // Duyệt qua mảng dữ liệu và tạo các input tương ứng
+
         data.forEach(function(item, index) {
-            // Tạo các input động cho mỗi phần tử trong data
-            if(item.select == "select"){
-                if (item.name == "status") {
-                    var selected1 = item.value == 1 ? "selected" : "";
-                    var selected2 = item.value == 2 ? "selected" : "";
-                    var inputHTML = `
-                        <div class="form-group">
-                            <label for="input_${index}">${item.label}</label>
-                            <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
-                                <option value="1" ${selected1}>Hoạt động</option>
-                                <option value="2" ${selected2}>Ngưng hoạt động</option>
-                            </select>
-                        </div>
+            let inputHTML = '';
+            if (item.setting == "select") {
+                let options = '';
+                let optionData = [];
+                switch (item.name) {
+                    case 'status':
+                        options = `
+                        <option value="1" ${item.value == 1 ? 'selected' : ''}>Hoạt động</option>
+                        <option value="2" ${item.value == 2 ? 'selected' : ''}>Ngưng hoạt động</option>
                     `;
+                        break;
+
+                    case 'brand_id':
+                        optionData = @json($dataB);
+                        options = optionData.map(brand => `
+                        <option value="${brand.id}" ${brand.id == item.value ? 'selected' : ''}>${brand.brand_name}</option>
+                    `).join('');
+                        break;
+
+                    case 'category_id':
+                        optionData = @json($dataC);
+                        options = optionData.map(cat => `
+                        <option value="${cat.id}" ${cat.id == item.value ? 'selected' : ''}>${cat.category_name}</option>
+                    `).join('');
+                        break;
+
+                    case 'product_type_id':
+                        optionData = @json($dataPT);
+                        options = optionData.map(pt => `
+                        <option value="${pt.id}" ${pt.id == item.value ? 'selected' : ''}>${pt.product_type_name}</option>
+                    `).join('');
+                        break;
+
+                    default:
+                        options = `<option value="">Không có dữ liệu</option>`;
+                        break;
                 }
-                if (item.name == "role_id"){
-                    
-                    let options = dataSelect.map(role => {
-                    let selected = role.id == item.value ? 'selected' : '';
-                        return `<option value="${role.id}" ${selected}>${role.role_name}</option>`;
-                    }).join('');
-                    var inputHTML = `
-                        <div class="form-group">
-                                <label for="input_${index}">${item.label}</label>
-                                <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
-                                    ${options}
-                                </select>
-                            </div>
-                        `
-                }
-                
+                inputHTML = `
+                <div class="form-group mb-2">
+                    <label for="input_${index}">${item.label}</label>
+                    <select id="input_${index}" name="${item.name}" class="form-control form-control-sm form-select select2" ${item.disabled}>
+                        ${options}
+                    </select>
+                </div>
+            `;
             } else {
-                var inputHTML = `
-                    <div class="form-group">
-                        <label for="input_${index}">${item.label}</label>
-                        <input type="${item.type}" class="form-control" id="input_${index}" name="${item.name}" value="${item.value}" placeholder="${item.placeholder}" ${item.disabled}>
-                    </div>
-                `;
+                inputHTML = `
+                <div class="form-group mb-2">
+                    <label for="input_${index}">${item.label}</label>
+                    <input type="${item.type}" class="form-control" id="input_${index}" name="${item.name}" value="${item.value}" placeholder="${item.placeholder}" ${item.disabled}>
+                </div>
+            `;
             }
-            // Append input vào form
             $('#dynamicInputs').append(inputHTML);
         });
     }
 
     let currentEditId = null;
+
     function onEdit(id) {
         currentEditId = id;
         let editUrl = editGetBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
@@ -393,7 +423,7 @@
         });
     }
 
-    function saveModalEdit(){
+    function saveModalEdit() {
         let formData = $('#formModal').serialize();
         let editUrl = editPostBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $.ajax({
@@ -401,15 +431,14 @@
             type: 'POST',
             data: formData,
             success: function(result) {
-            if(result.success){
-                window.location.replace(result.url);
-            }
-            else{
-                Swal.fire({
-                title: result.mess,
-                icon: "warning"
-                });
-            }
+                if (result.success) {
+                    window.location.replace(result.url);
+                } else {
+                    Swal.fire({
+                        title: result.mess,
+                        icon: "warning"
+                    });
+                }
             },
         })
     }
@@ -417,8 +446,9 @@
 
 <!-- Delete -->
 <script>
-    const deleteBaseUrl = @json(route('admin.account.delete', ['id' => 'ID_PLACEHOLDER']));
-    function onDelete(id){
+    const deleteBaseUrl = @json(route('admin.product.delete', ['id' => 'ID_PLACEHOLDER']));
+
+    function onDelete(id) {
         currentEditId = id;
         let deleteUrl = deleteBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $.ajax({
@@ -427,45 +457,167 @@
             processData: false,
             contentType: false,
             success: function(result) {
-            if(result.success){
-                window.location.replace(result.url);
-            }
-            else{
-                Swal.fire({
-                title: result.mess,
-                icon: "warning"
-                });
-            }
+                if (result.success) {
+                    window.location.replace(result.url);
+                } else {
+                    Swal.fire({
+                        title: result.mess,
+                        icon: "warning"
+                    });
+                }
             },
         })
     }
-</script>  
-    
+</script>
+
 <!-- MODAL VIEW-->
 <script>
     const viewBaseUrl = @json(route('admin.product.view', ['id' => 'ID_PLACEHOLDER']));
+
     function onView(id) {
         currentEditId = id;
+        console.log(currentEditId);
         let viewUrl = viewBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
-        $('#saveModal').hide();
-        $('#formModal')[0].reset();
-        $('#modalForm').modal('show');
-        
+        $('#modalView').modal('show');
         $.ajax({
             url: viewUrl,
             type: 'GET',
             processData: false,
             contentType: false,
             success: function(result) {
-
                 if (result.success) {
-                    $('#inputTitle').text("Chi Tiết " + result.title);
-                    // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
-                    var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
-                    createDynamicInputs(dynamicData);
+                    const tbodyDetail = $('#productDetail tbody');
+                    tbodyDetail.empty(); // Xoá dữ liệu cũ nếu có
+                    result.dataDT.forEach(function(item) {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.product_id}</td>
+                                <td>${item.size}</td>
+                                <td>${item.price}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.created_at ? moment(item.created_at).format('DD/MM/YYYY H:mm') : '-'}</td>
+                                <td>${item.updated_at ? moment(item.updated_at).format('DD/MM/YYYY H:mm') : '-'}</td>
+                                <td>${item.statusCustom}</td>
+                            </tr>
+                        `;
+                        tbodyDetail.append(row);
+                    });
+
+                    const tbodyID = $('#productID tbody');
+                    tbodyID.empty(); // Xoá dữ liệu cũ nếu có
+                    result.dataID.forEach(function (item, index) {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.product_name.length > 20 ? item.product_name.substring(0, 18) + ".." : item.product_name}</td>
+                                <td><img src="{{ asset('backend/assets/images/products/${item.avatar}') }}" alt="Ảnh" width="70" height="70"></td>
+                                <td>${item.created_at ? moment(item.created_at).format('DD/MM/YYYY H:mm') : '-'}</td>
+                                <td>${item.updated_at ? moment(item.updated_at).format('DD/MM/YYYY H:mm') : '-'}</td>   
+                                <td>${item.statusCustom}</td>
+                            </tr>
+                        `;
+                        tbodyID.append(row);
+                    });
+                    // Nếu muốn set tiêu đề modal
+                    $('#inputTitleDetail').text('Chi tiết sản phẩm #' + currentEditId);
+
                 }
             }
         });
+    }
+</script>
+
+
+<!-- MODAL ADD-->
+<script>
+    function onAdd() {
+        currentEditId = null;
+        $('#inputTitle').text('Thêm mới vai trò');
+        $('#formModal')[0].reset();
+        $('#dynamicInputs').empty();
+
+        const data = [{
+                label: 'Tên sản phẩm',
+                name: 'product_name',
+                type: 'text',
+                value: '',
+                placeholder: 'Nhập tên sản phẩm',
+                setting: ''
+            },
+            {
+                label: 'Thông tin sản phẩm',
+                name: 'description',
+                type: 'text',
+                value: '',
+                placeholder: 'Nhập thông tin sản phẩm',
+                setting: ''
+            },
+            {
+                label: 'Ảnh sản phẩm',
+                name: 'avatar',
+                type: 'text',
+                value: '',
+                placeholder: 'Chọn ảnh sản phẩm',
+                setting: ''
+            },
+            {
+                label: 'Danh mục',
+                name: 'category_id',
+                type: 'text',
+                value: '',
+                placeholder: '',
+                setting: 'select'
+            },
+            {
+                label: 'Loại sản phẩm',
+                name: 'product_type_id',
+                type: 'text',
+                value: '',
+                placeholder: '',
+                setting: 'select'
+            },
+            {
+                label: 'Thương hiệu',
+                name: 'brand_id',
+                type: 'text',
+                value: '',
+                placeholder: '',
+                setting: 'select'
+            },
+            {
+                label: 'Trạng thái',
+                name: 'status',
+                type: 'select',
+                value: 1,
+                placeholder: '',
+                setting: 'select'
+            }
+        ];
+
+        createDynamicInputs(data);
+        // Đổi nút lưu để gọi đúng hàm
+        $('#saveModal').attr('onclick', 'saveModalAdd()');
+        $('#modalForm').modal('show');
+    }
+
+    function saveModalAdd() {
+        let formData = $('#formModal').serialize();
+        $.ajax({
+            url: `{{route('admin.product.add')}}`,
+            type: 'POST',
+            data: formData,
+            success: function(result) {
+                if (result.success) {
+                    window.location.replace(result.url);
+                } else {
+                    Swal.fire({
+                        title: result.mess,
+                        icon: "warning"
+                    });
+                }
+            },
+        })
     }
 </script>
 @endsection

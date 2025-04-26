@@ -15,16 +15,8 @@ class SupplierController extends Controller
 
     public function supplierData(Request $request){
        
-        $data=DB::table('suppliers')->select(
-            '*',
-            DB::raw('
-                CASE
-                    WHEN status = 1 THEN "Đang hoạt động"
-                    WHEN status = 2 THEN "Ngưng hoạt động"
-                    ELSE 0
-                END as statusCustom
-            '),
-        );
+        $data=DB::table('suppliers')
+        ->select('*','suppliers.status as statusCustom');
         // if($request->searchInput && $request->searchSelect){
         //     $sInput=$request->searchInput;
         //     $sSelect=$request->searchSelect;

@@ -302,7 +302,7 @@
                     var selected2 = item.value == 2 ? "selected" : "";
                     var selected3 = item.value == 3 ? "selected" : "";
                     var inputHTML = `
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label for="input_${index}">${item.label}</label>
                             <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
                                 <option value="1" ${selected1}>Hoạt động</option>
@@ -314,13 +314,12 @@
                 }
                 if (item.name == "role_id"){
                     const dataSelect = @json($dataRoles);
-                    
                     let options = dataSelect.filter(role => role.id != 1).map(role => {
                             let selected = role.id == item.value ? 'selected' : '';
                             return `<option value="${role.id}" ${selected}>${role.role_name}</option>`;
                         }).join('');
                     var inputHTML = `
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                                 <label for="input_${index}">${item.label}</label>
                                 <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm" ${item.disabled}>
                                     ${options}
@@ -331,7 +330,7 @@
                 
             } else {
                 var inputHTML = `
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label for="input_${index}">${item.label}</label>
                         <input type="${item.type}" class="form-control" id="input_${index}" name="${item.name}" value="${item.value}" placeholder="${item.placeholder}" ${item.disabled}>
                     </div>
@@ -392,7 +391,6 @@
 <script>
     const viewBaseUrl = @json(route('admin.account.view', ['id' => 'ID_PLACEHOLDER']));
     function onView(id) {
-        console.log(id);
         currentEditId = id;
         let viewUrl = viewBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $('#saveModal').hide();

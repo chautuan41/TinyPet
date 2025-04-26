@@ -23,14 +23,7 @@ class ProductController extends Controller
         ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
         ->leftJoin('product_types', 'products.product_type_id', '=', 'product_types.id')
         ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
-        ->select('*','products.id as id',DB::raw('
-            CASE
-                WHEN products.status = 1 THEN "Đang hoạt động"
-                WHEN products.status = 2 THEN "Ngưng hoạt động"
-                ELSE 0
-            END as statusCustom
-            ')
-        );
+        ->select('*','products.id as id','products.status as statusCustom');
         if($request->searchInput && $request->searchSelect){
             switch($request->searchSelect){
                 case 'status':
@@ -65,9 +58,8 @@ class ProductController extends Controller
         ]);
     }
 
-    public function getEditProduct($id, Request $request){
+    public function showEdit($id, Request $request){
         $data=DB::table('products')
-        ->leftJoin('categories', 'products.category_id','categories.id' )
         ->where('id',  $id)
         ->first();
         
@@ -80,39 +72,46 @@ class ProductController extends Controller
                 'setting' => '',
             ],
             [
-                'label' => 'Tên sản phẩm',
-                'name' => 'product_name',
+                'label' => 'Thông tin sản phẩm',
+                'name' => 'description',
                 'type' => 'text',
                 'placeholder' => 'Nhập tên sản phẩm',
                 'setting' => '',
             ],
             [
-                'label' => 'Tên sản phẩm',
-                'name' => 'product_name',
+                'label' => 'Ảnh',
+                'name' => 'avatar',
                 'type' => 'text',
                 'placeholder' => 'Nhập tên sản phẩm',
                 'setting' => '',
             ],
             [
-                'label' => 'Tên sản phẩm',
-                'name' => 'product_name',
+                'label' => 'Danh mục',
+                'name' => 'category_id',
                 'type' => 'text',
                 'placeholder' => 'Nhập tên sản phẩm',
-                'setting' => '',
+                'setting' => 'select',
             ],
             [
-                'label' => 'Tên sản phẩm',
-                'name' => 'product_name',
+                'label' => 'Loại sản phẩm',
+                'name' => 'product_type_id',
                 'type' => 'text',
                 'placeholder' => 'Nhập tên sản phẩm',
-                'setting' => '',
+                'setting' => 'select',
+            ],
+            [
+                'label' => 'Thương hiệu',
+                'name' => 'brand_id',
+                'type' => 'text',
+                'placeholder' => 'Nhập tên sản phẩm',
+                'setting' => 'select',
             ],
             [
                 'label' => 'Tình trạng',
                 'name' => 'status',
                 'type' => 'status',
                 'placeholder' => 'Nhập status',
-                'setting' => '',
+                'setting' => 'select',
             ]
         ];
 
@@ -129,9 +128,141 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'title' => "vai trò",
+            'title' => "sản phẩm",
             'data' => $dataFields,
         ]);
         
+    }
+
+    public function postEdit($id, Request $request){
+
+        $request->validate([
+            'product_name' => 'required|string|max:255|',
+            'description' => 'required|string|',
+            'avatar' => 'required|string|max:255|',
+            'category_id' => 'required|integer',
+            'brand_id' => 'required|integer',
+            'product_type_id' => 'required|integer',
+            'status' => 'required|in:1,2,3', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động, 3 = đã bị khóa
+            // thêm các trường khác nếu có
+        ]);
+        
+        try {
+            // Cập nhật dữ liệu
+            DB::table('products')
+                ->where('id', $id)
+                ->update([
+                    'product_name' => $request->input('product_name'),
+                    'description' => $request->input('description'),
+                    'avatar' => $request->input('avatar'),
+                    'category_id' => $request->input('category_id'),
+                    'product_type_id' => $request->input('product_type_id'),
+                    'brand_id' => $request->input('brand_id'),
+                    'status' => $request->input('status'),
+                    'updated_at' => now() // Cập nhật thời gian sửa
+                ]);
+                
+            return response()->json([
+                'success' => true,
+                'url' => route('admin.product'), // Redirect sau khi cập nhật
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'mess' => 'Lỗi khi cập nhật sản phẩm: ' . $e->getMessage()
+            ]);
+        }
+
+    }
+
+    public function add(Request $request){
+
+        $request->validate([
+            'product_name' => 'required|string|max:255|',
+            'description' => 'required|string|',
+            'avatar' => 'required|string|max:255|',
+            'category_id' => 'required|integer',
+            'brand_id' => 'required|integer',
+            'product_type_id' => 'required|integer',
+            'status' => 'required|in:1,2', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động, 3 = đã bị khóa
+            // thêm các trường khác nếu có
+        ]);
+        
+        try {
+            // Thêm dữ liệu
+            DB::table('products')
+                ->insert([
+                    'product_name' => $request->input('product_name'),
+                    'description' => $request->input('description'),
+                    'avatar' => $request->input('avatar'),
+                    'category_id' => $request->input('category_id'),
+                    'product_type_id' => $request->input('product_type_id'),
+                    'brand_id' => $request->input('brand_id'),
+                    'status' => $request->input('status'),
+                    'updated_at' => now(), // Cập nhật thời gian sửa
+                    'created_at' => now()
+                ]);
+    
+            return response()->json([
+                'success' => true,
+                'url' => route('admin.product'), // Redirect sau khi cập nhật
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'mess' => 'Lỗi khi thêm sản phẩm: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function view($id){
+        $dataID= db::table('products')
+        ->where('id',$id)
+        ->select('*',DB::raw('
+            CASE
+                WHEN status = 1 THEN "Đang hoạt động"
+                WHEN status = 2 THEN "Tạm ngưng hoạt động"
+            END as statusCustom
+            ')
+        )
+        ->get();
+        $dataDT = db::table('product_details')
+        ->where('product_id',$id)
+        ->where('status',1)
+        ->select('*',DB::raw('
+            CASE
+                WHEN status = 1 THEN "Đang hoạt động"
+                WHEN status = 2 THEN "Tạm ngưng hoạt động"
+            END as statusCustom
+            ')
+        )
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'dataDT' => $dataDT,
+            'dataID' => $dataID,
+        ]);
+    }
+
+    public function delete($id){
+        try {
+            // Cập nhật dữ liệu
+            DB::table('products')
+                ->where('id', $id)
+                ->update([
+                    'status' => 3,
+                    'updated_at' => now() // Cập nhật thời gian sửa
+                ]);
+            return response()->json([
+                'success' => true,
+                'url' => route('admin.product'), // Redirect sau khi cập nhật
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'mess' => 'Lỗi khi cập nhật sản phẩm: ' . $e->getMessage()
+            ]);
+        }
     }
 }
