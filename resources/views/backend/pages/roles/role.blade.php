@@ -8,16 +8,16 @@
         <div class="col-12">
             <div class="card w-100">
                 <div class="card-body p-4">
-                    <a  href="{{route('admin.role')}}"><h5 class="card-title fw-semibold mb-4">Bảng vai trò</h5></a> 
+                    <a  href="{{route('admin.role')}}"><h5 class="card-title fw-semibold mb-4">Bảng Vai Trò</h5></a> 
                     <div class="form-group">
                         <form id="searchForm">
                             <div class="row justify-content-end">
                                 <div class="col-md-6">
                                     <div class="input-group">
                                         <select id="searchSelect" name="searchSelect" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm">
-                                            <option disabled selected>Lựa chọn tìm kiếm</option>
-                                            <option value="role_id">Vai trò</option>
-                                            <option value="status">Trạng thái</option>
+                                            <option disabled selected>Lựa Chọn Tìm Kiếm</option>
+                                            <option value="role_id">Vai Trò</option>
+                                            <option value="status">Trạng Thái</option>
                                         </select>
                                         <div id="contentSearch" class="form-control">
                                             <input type="hidden" name="searchInput" class="form-control form-control-sm" id="searchInput">
@@ -26,14 +26,14 @@
                                 </div>
                                 <div class="col-md-2">
                                     <button class="btn btn-primary light"
-                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm kiếm
+                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm Kiếm
                                     </button>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <button class="btn btn-secondary light "
-                        title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm vai trò</button>
+                        title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm Vai Trò</button>
                         
                     <hr>
                     
@@ -45,19 +45,19 @@
                                         <h6 class="fw-semibold mb-0">ID</h6>
                                     </th>
                                     <th class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-0">Tên vai trò</h6>
+                                        <h6 class="fw-semibold mb-0">Tên Vai Trò</h6>
                                     </th>
                                     <th class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-0">Trạng thái</h6>
+                                        <h6 class="fw-semibold mb-0">Trạng Thái</h6>
                                     </th>
                                     <th class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-0">Ngày tạo</h6>
+                                        <h6 class="fw-semibold mb-0">Ngày Tạo</h6>
                                     </th>
                                     <th class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-0">Ngày cập nhật</h6>
+                                        <h6 class="fw-semibold mb-0">Ngày Cập Nhật</h6>
                                     </th>
                                     <th class="border-bottom-0">
-                                        <h6 class="fw-semibold mb-0">Chức năng</h6>
+                                        <h6 class="fw-semibold mb-0">Chức Năng</h6>
                                     </th>
                                 </tr>
                             </thead>
@@ -106,8 +106,8 @@
                 complete: function() {},
             },
             oLanguage: {
-                sLengthMenu: `Hiển thị _MENU_ <span class="tutorial" id="I-NDH-016"></span>`,
-                sInfo: `Hiển thị _END_ dòng <span class="tutorial" id="I-NDH-017"></span>`,
+                sLengthMenu: `Hiển Thị _MENU_ <span class="tutorial" id="I-NDH-016"></span>`,
+                sInfo: `Hiển Thị _END_ Dòng <span class="tutorial" id="I-NDH-017"></span>`,
             },
             drawCallback: function() {
                 // idArray = ["I-NDH-016", "I-NDH-017"]
@@ -347,7 +347,7 @@
     
     function onAdd() {
         currentEditId = null;
-    $('#inputTitle').text('Thêm mới vai trò');
+    $('#inputTitle').text('Thêm Mới Vai Trò');
     $('#formModal')[0].reset();
     $('#dynamicInputs').empty();
 

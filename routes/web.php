@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/',[HomeController::class,'index'])->name('user.index');
 Route::get('/logout', [AuthController::class,'logout'])->name('logout');
+Route::get('/search',[HomeController::class,'search'])->name('user.search');
+Route::get('/search-get',[HomeController::class,'getSearch'])->name('user.search.get');
+Route::post('/search',[HomeController::class,'postSearch'])->name('user.search.post');
+Route::get('/product/{id}',[HomeController::class,'detailProduct'])->name('user.detailProduct');
 
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');

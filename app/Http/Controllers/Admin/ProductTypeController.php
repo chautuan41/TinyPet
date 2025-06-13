@@ -6,28 +6,35 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class CategoryController extends Controller
+class ProductTypeController extends Controller
 {
-      public function index()
+    //
+     //
+    public function index()
     {
         $dataSelect = DB::table('categories')->get();   
-        return view('backend.pages.categories.index',compact('dataSelect'));
+        return view('backend.pages.producttypes.index',compact('dataSelect'));
     }
 
     public function data(Request $request)
     {
         
-        $data = DB::table('categories')
-        ->select('*','status as statusCustom');
+        $data = DB::table('product_types')
+        ->leftJoin('categories', 'product_types.category_id', '=', 'categories.id')
+        ->select('*','product_types.id as idPT','product_types.status as statusCustom','product_types.created_at as created_at','product_types.updated_at as updated_at');
         if ($request->searchInput && $request->searchSelect) {
             $sInput = $request->searchInput;
             $sSelect = $request->searchSelect;
 
             if ($sSelect == 'status') {
-                $data = $data->where('status', $sInput);
+                $data = $data->where('product_types.status', $sInput);
             }
-            if ($sSelect == 'category') {
-                $data = $data->where('id', $sInput);
+            if ($sSelect == 'product_type_name') {
+                
+                $data = $data->where('product_type_name','like', '%'.$sInput.'%');
+            }
+             if ($sSelect == 'category') {
+                $data = $data->where('category_id','like', $sInput);
             }
         }
         $data = $data->get();
@@ -42,16 +49,23 @@ class CategoryController extends Controller
 
     public function showEdit($id)
     {
-        $data = DB::table('categories')
+        $data = DB::table('product_types')
             ->where('id',  $id)
             ->first();
 
         $field = [
             [
-                'label' => 'Tên danh mục',
-                'name' => 'category_name',
+                'label' => 'Tên loại sản phẩm',
+                'name' => 'product_type_name',
                 'type' => 'text',
-                'placeholder' => 'Nhập tên danh mục',
+                'placeholder' => 'Nhập tên loại sản phẩm',
+                'setting' => '',
+            ],
+            [
+                'label' => 'Danh mục',
+                'name' => 'category_id',
+                'type' => 'text',
+                'placeholder' => 'Nhập tên loại sản phẩm',
                 'setting' => '',
             ],
             [
@@ -76,30 +90,31 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'title' => "danh mục",
+            'title' => "loại sản phẩm",
             'data' => $dataFields,
         ]);
     }
 
     public function postEdit($id, Request $request){
         $request->validate([
-            'category_name' => 'required|string|max:255',
+            'product_type_name' => 'required|string|max:255',
             'status' => 'required|in:1,2', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động
             // thêm các trường khác nếu có
         ]);
         try {
             // Cập nhật dữ liệu
-            DB::table('categories')
+            DB::table('product_types')
                 ->where('id', $id)
                 ->update([
-                    'category_name' => $request->input('category_name'),
+                    'product_type_name' => $request->input('product_type_name'),
+                    'category_id' => $request->input('category_id'),
                     'status' => $request->input('status'),
                     'updated_at' => now() // Cập nhật thời gian sửa
                 ]);
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.productType'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -112,16 +127,17 @@ class CategoryController extends Controller
     public function add(Request $request){
 
         $request->validate([
-            'category_name' => 'required|string|max:255',
+            'product_type_name' => 'required|string|max:255',
             'status' => 'required|in:1,2', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động
             // thêm các trường khác nếu có
         ]);
         
         try {
             // Thêm dữ liệu
-            DB::table('categories')
+            DB::table('product_types')
                 ->insert([
-                    'category_name' => $request->input('category_name'),
+                    'product_type_name' => $request->input('product_type_name'),
+                    'category_id' => $request->input('category_id'),
                     'status' => $request->input('status'),
                     'updated_at' => now(), // Cập nhật thời gian sửa
                     'created_at' => now()
@@ -129,7 +145,7 @@ class CategoryController extends Controller
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.productType'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -142,7 +158,7 @@ class CategoryController extends Controller
     public function delete($id){
         try {
             // Cập nhật dữ liệu
-            DB::table('categories')
+            DB::table('product_types')
                 ->where('id', $id)
                 ->update([
                     'status' => 3,
@@ -151,7 +167,7 @@ class CategoryController extends Controller
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.productType'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([

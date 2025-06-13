@@ -8,16 +8,16 @@
         <div class="col-12">
             <div class="card w-100">
                 <div class="card-body p-4">
-                    <h5 class="card-title fw-semibold mb-4">Bảng phân quyền</h5>
+                    <h5 class="card-title fw-semibold mb-4">Bảng Nhà Cung Cấp</h5>
                     <div class="form-group">
                         <form id="searchForm">
                             <div class="row justify-content-end">
                                 <div class="col-md-6">
                                     <div class="input-group">
                                         <select id="searchSelect" name="searchSelect" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm">
-                                            <option>Lựa chọn tìm kiếm</option>
-                                            <option value="role_name">Tên phân quyền</option>
-                                            <option value="status">Trạng thái</option>
+                                            <option>Lựa Chọn Tìm Kiếm</option>
+                                            <option value="supplier_name">Tên Nhà Cung Cấp</option>
+                                            <option value="status">Trạng Thái</option>
                                         </select>
                                         <div id="contentSearch" class="form-control">
                                             <input type="text" name="searchInput" class="form-control form-control-sm" id="searchInput">
@@ -26,12 +26,12 @@
                                 </div>
                                 <div class="col-md-2">
                                     <button class="btn btn-primary light"
-                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm kiếm</button>
+                                        title="Nhấn để tìm kiếm" type="button" onclick="btnSearch()" id="searchBtn">Tìm Kiếm</button>
                                 </div>
                             </div>
                         </form>
                         <button class="btn btn-secondary light "
-                        title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm vai trò</button>
+                        title="Nhấn để tìm kiếm" type="button" onclick="onAdd()" id="saveEdit">Thêm Nhà Cung Cấp</button>
                         
                     <hr>
                     </div>
@@ -77,14 +77,17 @@
             </div>
         </div>
     </div>
-    <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="pe-1 text-primary text-decoration-underline">AdminMart.com</a> Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
-    </div>
 </div>
 
 <script>
+    $(document).ready(function() {
+        //Load url
+        urlLoad(); 
+        
+       
+    });
+    //Load data
     render();
-
     function render(data = '') {
         arrID = [];
 
@@ -240,37 +243,12 @@
             }
         });
     };
+    //Link 
+</script>
 
-    function btnSearch() {
-        search();
-    };
-
-    $(document).ready(function() {
-        urlLoad()
-        
-    });
-
-    
-
-
-
-    function search() {
-        let formData = new FormData($('#searchForm')[0]);
-        var object = {};
-
-        formData.forEach(function(value, key) {
-            object[key] = value;
-            // let text = $(`#${key} option:selected`).text();
-            // if (text) {
-            //     object[`text_${key}`] = text;
-            // }
-        });
-        history.pushState({}, null, "/admin/role?search=" + btoa(encodeURIComponent(JSON.stringify(object))));
-        $('#role').DataTable().destroy();
-        render(object);
-    };
-
-
+<!-- SEARCH-->
+<script>
+    //Lựa chọn tìm kiếm
     $('#searchSelect').on('change', function() {
         let searchSelect = $(this).val();
         $(this).parent().find('#contentSearch').html(`
@@ -284,31 +262,26 @@
             `);
         };
     });
+    
+    
 
+    // Button search
+    function btnSearch() {
+        let formData = new FormData($('#searchForm')[0]);
+        var object = {};
+        formData.forEach(function(value, key) {
+            object[key] = value;
+            // let text = $(`#${key} option:selected`).text();
+            // if (text) {
+            //     object[`text_${key}`] = text;
+            // }
+        });
+        history.pushState({}, null, "/admin/supplier?search=" + btoa(encodeURIComponent(JSON.stringify(object))));
+        $('#supplier').DataTable().destroy();
+        render(object);
+    };
 
-
-    function onEdit(data) {
-        $('#editRoleModal').modal('show');
-        $.ajax({
-            url: `/admin/role/edit/${data}`,
-            type: 'GET',
-            processData: false,
-            contentType: false,
-            success: function(result) {
-                if (result.success) {
-                    $('#userInputModal').val(result.data.role_name);
-                    $('#searchSelectModal').val(result.data.status).trigger('change');
-                } else {
-                    Swal.fire({
-                        title: result.mess,
-                        icon: "warning"
-                    });
-                }
-            }
-        })
-    }
-
-
+    //Search url 
     function urlLoad() {
         let url = window.location.href;
         let param = new URL(url).searchParams.get("search");
@@ -316,8 +289,209 @@
             data = JSON.parse(decodeURIComponent(atob(param)));
             $('#searchSelect').val(data.searchSelect).trigger('change');
             $('#searchInput').val(data.searchInput).trigger('change');
-            search();
+            btnSearch();
         }
     }
 </script>
+
+
+
+<!-- MODAL EDIT-->
+<script>
+    const editGetBaseUrl = @json(route('admin.supplier.editGet', ['id' => 'ID_PLACEHOLDER']));
+    const editPostBaseUrl = @json(route('admin.supplier.editPost', ['id' => 'ID_PLACEHOLDER']));
+    function createDynamicInputs(data) {
+        // Clear previous inputs if any
+        $('#dynamicInputs').empty();
+        // Duyệt qua mảng dữ liệu và tạo các input tương ứng
+        data.forEach(function(item, index) {
+            // Tạo các input động cho mỗi phần tử trong data
+            if (item.name == "status") {
+                var selected1 = item.value == 1 ? "selected" : "";
+                var selected2 = item.value == 2 ? "selected" : "";
+                var inputHTML = `
+                    <div class="form-group mb-2">
+                        <label for="input_${index}">${item.label}</label>
+                        <select id="SelectModal" name="${item.name}" class="form-control form-control-sm form-select select2" data-placeholder="Điều kiện tìm kiếm">
+                            <option value="1" ${selected1}>Hoạt động</option>
+                            <option value="2" ${selected2}>Ngưng hoạt động</option>
+                        </select>
+                    </div>
+                `;
+            } else {
+                var inputHTML = `
+                    <div class="form-group mb-2">
+                        <label for="input_${index}">${item.label}</label>
+                        <input type="${item.type}" class="form-control" id="input_${index}" name="${item.name}" value="${item.value}" placeholder="${item.placeholder}" ${item.setting}>
+                    </div>
+                `;
+            }
+            // Append input vào form
+            $('#dynamicInputs').append(inputHTML);
+        });
+    }
+
+    let currentEditId = null;
+    function onEdit(id) {
+        currentEditId = id;
+        let editUrl = editGetBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        $('#formModal')[0].reset();
+        $('#modalForm').modal('show');
+        $('#saveModal').attr('onclick', 'saveModalEdit()');
+        
+        $.ajax({
+            url: editUrl,
+            type: 'GET',
+            processData: false,
+            contentType: false,
+            success: function(result) {
+
+                if (result.success) {
+                    $('#inputTitle').text("Chỉnh sửa " + result.title);
+                    // Giả sử `result.data` chứa thông tin cấu trúc cho các input động
+                    var dynamicData = result.data; // Dữ liệu có thể là mảng các đối tượng, ví dụ [{label: 'Tên', name: 'name', type: 'text', value: '', placeholder: 'Nhập tên'}]
+                    createDynamicInputs(dynamicData);
+                }
+            }
+        });
+    }
+
+    function saveModalEdit(){
+        let formData = $('#formModal').serialize();
+        let editUrl = editPostBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+        
+        $.ajax({
+            url: editUrl,
+            type: 'POST',
+            data: formData,
+            success: function(result) {
+            if(result.success){
+                window.location.replace(result.url);
+            }
+            else{
+                Swal.fire({
+                title: result.mess,
+                icon: "warning"
+                });
+            }
+            },
+        })
+    }
+</script>
+
+<!-- MODAL ADD-->
+<script>
+    
+    function onAdd() {
+        currentEditId = null;
+    $('#inputTitle').text('Thêm Mới Nhà Cung Cấp');
+    $('#formModal')[0].reset();
+    $('#dynamicInputs').empty();
+
+    const data = [{
+                label: 'Tên nhà cung cấp',
+                name: 'supplier_name',
+                type: 'text',
+                value: '',
+                placeholder: 'Nhập nhà cung cấp',
+                setting: ''
+            },
+            {
+                label: 'Địa chỉ',
+                name: 'supplier_address',
+                type: 'text',
+                value: '',
+                placeholder: 'Nhập địa chỉ',
+                setting: ''
+            },
+            {
+                label: 'Số điện thoại',
+                name: 'supplier_phone',
+                type: 'text',
+                value: '',
+                placeholder: 'Nhập số điện thoại',
+                setting: ''
+            },
+            {
+                label: 'Trạng thái',
+                name: 'status',
+                type: 'select',
+                value: 1,
+                placeholder: '',
+                setting: 'select'
+            }
+        ];
+
+    createDynamicInputs(data);
+    // Đổi nút lưu để gọi đúng hàm
+    $('#saveModal').attr('onclick', 'saveModalAdd()');
+    $('#modalForm').modal('show');
+    }
+
+    function saveModalAdd() {
+        let formData = $('#formModal').serialize();
+        $.ajax({
+            url: `{{route('admin.supplier.add')}}`,
+            type: 'POST',
+            data: formData,
+            success: function(result) {
+            if(result.success){
+                window.location.replace(result.url);
+            }
+            else{
+                Swal.fire({
+                title: result.mess,
+                icon: "warning"
+                });
+            }
+            },
+        })
+    }
+</script>
+
+<!-- Delete -->
+<script>
+    const deleteBaseUrl = @json(route('admin.supplier.delete', ['id' => 'ID_PLACEHOLDER']));
+
+    function onDelete(id) {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xoá?',
+            text: "Hành động này không thể hoàn tác!",
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Xoá',
+            cancelButtonText: 'Huỷ'
+        }).then((result) => {
+                if (result.value) { 
+                    currentEditId = id;
+                    deleteUrl = deleteBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'GET',
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                title: 'Đã xoá!',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                                }).then(() => {
+                                        location.reload();
+                                    });
+                            } else {
+                                Swal.fire({
+                                    title: 'Xoá thất bại!',
+                                    icon: "error"
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+    }
+</script>
+
+
 @endsection

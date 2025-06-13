@@ -134,7 +134,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="" aria-expanded="false">
+              <a class="sidebar-link" href="{{route('admin.productType')}}" aria-expanded="false">
                 <span>
                 <i class="fa-regular fa-calendar"></i>
                 </span>
@@ -142,7 +142,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="" aria-expanded="false">
+              <a class="sidebar-link" href="{{route('admin.category')}}" aria-expanded="false">
                 <span>
                   <i class="fa-regular fa-rectangle-list"></i>
                 </span>
@@ -150,7 +150,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="" aria-expanded="false">
+              <a class="sidebar-link" href="{{route('admin.brand')}}" aria-expanded="false">
                 <span>
                 <i class="fa-regular fa-chess-queen"></i>
                 </span>
@@ -172,6 +172,14 @@
             <li class="sidebar-item">
               <a class="sidebar-link" href="" aria-expanded="false">
                 <span>
+                <i class="fa-regular fa-clipboard"></i>
+                </span>
+                <span class="hide-menu">Đơn hàng</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="" aria-expanded="false">
+                <span>
                 <i class="fa-regular fa-file-lines"></i>
                 </span>
                 <span class="hide-menu">Hóa đơn bán hàng</span>
@@ -180,7 +188,7 @@
             <li class="sidebar-item">
               <a class="sidebar-link" href="" aria-expanded="false">
                 <span>
-                <i class="fa-regular fa-clipboard"></i>
+                <i class="fa-regular fa-file-lines"></i>
                 </span>
                 <span class="hide-menu">Hóa đơn nhập hàng</span>
               </a>

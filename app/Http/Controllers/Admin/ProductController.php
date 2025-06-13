@@ -17,7 +17,7 @@ class ProductController extends Controller
         
     }
 
-    public function productData(Request $request){
+    public function data(Request $request){
         
         $data=DB::table('products')
         ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
@@ -42,7 +42,7 @@ class ProductController extends Controller
                     $data=$data->where('products.id', $request->searchInput);
                     break;
                 case 'product_name':
-                    $data=$data->where('products.product_name','like', '%'.$request->searchInput.'%');
+                    $data=$data->where('products.product_name', );
                     break;
                 default:
                     break;

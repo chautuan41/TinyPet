@@ -6,30 +6,30 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class CategoryController extends Controller
+class BrandController extends Controller
 {
-      public function index()
+    public function index()
     {
-        $dataSelect = DB::table('categories')->get();   
-        return view('backend.pages.categories.index',compact('dataSelect'));
+        $dataSelect = DB::table('brands')->get();   
+        return view('backend.pages.brands.index',compact('dataSelect'));
     }
 
     public function data(Request $request)
     {
         
-        $data = DB::table('categories')
-        ->select('*','status as statusCustom');
+        $data = DB::table('brands')
+        ->select('*','.status as statusCustom');
         if ($request->searchInput && $request->searchSelect) {
             $sInput = $request->searchInput;
             $sSelect = $request->searchSelect;
-
             if ($sSelect == 'status') {
                 $data = $data->where('status', $sInput);
-            }
-            if ($sSelect == 'category') {
-                $data = $data->where('id', $sInput);
-            }
-        }
+            };
+            if ($sSelect == 'brand_name') {
+                $data = $data->where('brand_name','like', '%'.$sInput.'%');
+            };
+            
+        };
         $data = $data->get();
         $totalRecords = count($data);
 
@@ -42,16 +42,16 @@ class CategoryController extends Controller
 
     public function showEdit($id)
     {
-        $data = DB::table('categories')
+        $data = DB::table('brands')
             ->where('id',  $id)
             ->first();
 
         $field = [
             [
-                'label' => 'Tên danh mục',
-                'name' => 'category_name',
+                'label' => 'Tên thương hiệu',
+                'name' => 'brand_name',
                 'type' => 'text',
-                'placeholder' => 'Nhập tên danh mục',
+                'placeholder' => 'Nhập tên thương hiệu',
                 'setting' => '',
             ],
             [
@@ -76,30 +76,30 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'title' => "danh mục",
+            'title' => "thương hiệu",
             'data' => $dataFields,
         ]);
     }
 
     public function postEdit($id, Request $request){
         $request->validate([
-            'category_name' => 'required|string|max:255',
+            'brand_name' => 'required|string|max:255',
             'status' => 'required|in:1,2', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động
             // thêm các trường khác nếu có
         ]);
         try {
             // Cập nhật dữ liệu
-            DB::table('categories')
+            DB::table('brands')
                 ->where('id', $id)
                 ->update([
-                    'category_name' => $request->input('category_name'),
+                    'brand_name' => $request->input('brand_name'),
                     'status' => $request->input('status'),
                     'updated_at' => now() // Cập nhật thời gian sửa
                 ]);
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.brand'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -112,16 +112,16 @@ class CategoryController extends Controller
     public function add(Request $request){
 
         $request->validate([
-            'category_name' => 'required|string|max:255',
+            'brand_name' => 'required|string|max:255',
             'status' => 'required|in:1,2', // Giả sử chỉ có 1 = hoạt động, 2 = ngưng hoạt động
             // thêm các trường khác nếu có
         ]);
         
         try {
             // Thêm dữ liệu
-            DB::table('categories')
+            DB::table('brands')
                 ->insert([
-                    'category_name' => $request->input('category_name'),
+                    'brand_name' => $request->input('brand_name'),
                     'status' => $request->input('status'),
                     'updated_at' => now(), // Cập nhật thời gian sửa
                     'created_at' => now()
@@ -129,7 +129,7 @@ class CategoryController extends Controller
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.brand'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -142,7 +142,7 @@ class CategoryController extends Controller
     public function delete($id){
         try {
             // Cập nhật dữ liệu
-            DB::table('categories')
+            DB::table('brands')
                 ->where('id', $id)
                 ->update([
                     'status' => 3,
@@ -151,7 +151,7 @@ class CategoryController extends Controller
     
             return response()->json([
                 'success' => true,
-                'url' => route('admin.category'), // Redirect sau khi cập nhật
+                'url' => route('admin.brand'), // Redirect sau khi cập nhật
             ]);
         } catch (\Exception $e) {
             return response()->json([
