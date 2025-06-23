@@ -19,10 +19,18 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/',[HomeController::class,'index'])->name('user.index');
 Route::get('/logout', [AuthController::class,'logout'])->name('logout');
+
 Route::get('/search',[HomeController::class,'search'])->name('user.search');
 Route::get('/search-get',[HomeController::class,'getSearch'])->name('user.search.get');
-Route::post('/search',[HomeController::class,'postSearch'])->name('user.search.post');
+Route::get('/search-result',[HomeController::class,'postSearch'])->name('user.search.post');
+
 Route::get('/product/{id}',[HomeController::class,'detailProduct'])->name('user.detailProduct');
+Route::get('/product',[HomeController::class,'product'])->name('user.product');
+
+Route::get('/cart',[HomeController::class,'cart'])->name('user.cart');
+Route::post('/cart',[HomeController::class,'addCart'])->name('user.cart.add');
+
+Route::get('/checkout',[HomeController::class,'checkout'])->name('user.checkout');
 
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');

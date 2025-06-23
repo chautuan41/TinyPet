@@ -18,7 +18,7 @@ class BrandController extends Controller
     {
         
         $data = DB::table('brands')
-        ->select('*','.status as statusCustom');
+        ->select('*','status as statusCustom');
         if ($request->searchInput && $request->searchSelect) {
             $sInput = $request->searchInput;
             $sSelect = $request->searchSelect;

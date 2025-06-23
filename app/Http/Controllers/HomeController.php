@@ -1,26 +1,68 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Cart;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\product;
+use App\Models\ProductDetail;
+
+use function Laravel\Prompts\table;
 
 class HomeController extends Controller
 {
     //
     public function index(){
-        $dtProduct = db::table('products')
-        ->join('product_details', 'products.id', '=', 'product_details.product_id')
-        ->select('products.*', 'product_details.price')
-        ->where('products.status',1)
-        ->limit(6)->get();
-
-        $dtNewProduct = DB::table('products')
-        ->join('product_details', 'products.id', '=', 'product_details.product_id')
-        ->select('products.*', 'product_details.price')
-        ->where('products.status',1)
-        ->orderBy('products.updated_at', 'desc')
+        // QUERY BUILDER
+    //    $dtProduct1 = DB::table('products')
+    //     ->select('products.*')
+    //     ->addSelect([
+    //         'price' => DB::table('product_details')
+    //             ->select('price')
+    //             ->whereColumn('product_id', 'products.id')
+    //             ->orderBy('price', 'asc')
+    //             ->limit(1)
+    //     ])
+    //     ->where('products.status', 1)
+    //     ->limit(6)
+    //     ->get();
+        
+        //ELOQUENT
+        $dtProduct = Product::withMin('productDetails', 'price')
+        ->addSelect([
+            'image' => DB::table('images')
+                ->select('image_path')
+                ->whereColumn('product_id', 'products.id')
+                ->limit(1)
+        ])
+        ->where('status', 1)
         ->limit(6)
         ->get();
+
+        
+        // $dtNewProduct = DB::table('products')
+        // ->join('product_details', 'products.id', '=', 'product_details.product_id')
+        // ->select('products.*', 'product_details.price')
+        // ->where('products.status',1)
+        // ->orderBy('products.updated_at', 'desc')
+        // ->limit(6)
+        // ->get();
+
+        $dtNewProduct = Product::withMin('productDetails', 'price')
+        ->addSelect([
+            'image' => DB::table('images')
+                ->select('image_path')
+                ->whereColumn('product_id', 'products.id')
+                ->limit(1)
+        ])
+        ->where('status', 1)
+        ->orderBy('updated_at', 'desc')
+        ->limit(6)
+        ->get();
+
+        
         
         return view('user.pages.home',compact('dtNewProduct','dtProduct'));
     }
@@ -41,29 +83,27 @@ class HomeController extends Controller
         return response()->json($data);
     }
     public function postSearch(Request $request){
+        $request->validate([
+            'keyword' => 'required|max:255|regex:/^[a-zA-Z0-9]+$/',
+        ]);
 
-        return view('user.pages.search');
+        $keyword = $request->query('keyword');
+
+        $data = Product::withMin('productDetails', 'price')
+        ->where('product_name', 'like', '%' . $keyword . '%')
+        ->get();
+
+        return view('user.pages.product',compact('data','keyword'));
     }
 
-    public function detailProduct($id, Request $request){
-        if ($request->inputSearch ) {
-            $data=db::table('products')
-            ->join('product_details', 'products.id', '=', 'product_details.product_id')
-            ->join('brands', 'products.brand_id', '=', 'brands.id')
-            ->select('products.*','product_details.size', 'product_details.price','brands.brand_name')
-            ->where('products.id',$id)
-            ->first();
-
-             return response()->json([
-            'data' => $data,
-            
-            ]);
-        }
+    public function detailProduct($id){
+        
+        $images = Image::where('product_id',$id)->get();
 
         $data=db::table('products')
         ->join('product_details', 'products.id', '=', 'product_details.product_id')
         ->join('brands', 'products.brand_id', '=', 'brands.id')
-        ->select('products.*','product_details.size', 'product_details.price','brands.brand_name')
+        ->select('products.*','product_details.id as id_productDetail','product_details.size', 'product_details.price','brands.brand_name')
         ->where('products.id',$id)
         ->first();
 
@@ -71,13 +111,59 @@ class HomeController extends Controller
         ->where('product_id',$id)
         ->get();
 
-        return view('user.pages.detailProduct',compact('data','sizes'));
+        return view('user.pages.detailProduct',compact('data','sizes','images'));
 
 
+    }
+
+    
+
+    public function product(){
+        
+        $data=$dtProduct = Product::withMin('productDetails', 'price')
+        ->where('status', 1)
+        ->get();
+        
+        $keyword="";
+
+        return view('user.pages.product',compact('data','keyword'));
     }
 
     function addCart(Request $request){
+        $validated = $request->validate([
+        'id_product' => 'required|exists:products,id',
+        'id_productDetail' => 'required|exists:product_details,id',
+        'quantity' => 'required|integer|min:1'
+        ]);
 
+        $cart = Cart::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'product_id' => $validated['id_product'],
+                'product_detail_id' => $validated['id_productDetail'],
+                'quantity' => DB::raw('quantity + ' . (int)$validated['quantity']),
+            ],
+        );
+
+        return response()->json([
+            'message' => 'Đã thêm vào giỏ hàng',
+            'cart' => $cart
+        ]);
     }
-    
+
+    function cart(){
+        $data=cart::with('productDetail','product')
+        ->where('user_id', auth()->id())
+        ->get();
+
+        return view('user.pages.cart',compact('data'));
+    }
+
+    function checkout(){
+        $carts = cart::with('productDetail','product')
+        ->where('user_id', auth()->id())
+        ->get();
+
+        return view('user.pages.checkout',compact('carts'));
+    }    
 }

@@ -10,15 +10,11 @@
                 <div class="bd-example">
                     <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
                         <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <img src="images/slider-img1.png" class="d-block w-100" alt="...">
+                            @foreach($images as $image)
+                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                <img src="{{ asset($image->image_path) }}" style="height:500" class="d-block w-100" alt="...">
                             </div>
-                            <div class="carousel-item">
-                                <img src="images/slider-img2.png" class="d-block w-100" alt="...">
-                            </div>
-                            <div class="carousel-item">
-                                <img src="images/slider-img3.png" class="d-block w-100" alt="...">
-                            </div>
+                            @endforeach
                         </div>
                         <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -43,7 +39,7 @@
                         Thương hiệu: {{ $data->brand_name}}
                     </p>
                     <p  class="price-display">
-                        Giá: {{ $data->price}} VNĐ
+                        Giá: {{ number_format($data->price, 0, ',', '.')}} VNĐ
                     </p>
                     <p>
                         Trọng lượng:
@@ -71,7 +67,7 @@
                         <button type="button" onclick="increaseQty()">+</button>
                     </div>
                         <input type="hidden" name="id_product" value="{{$data->id}}">
-                        <input class="id_productDetail" type="hidden" name="id_productDetail" value="">
+                        <input class="id_productDetail" type="hidden" name="id_productDetail" value="{{$data->id_productDetail}}">
 
                         <button type="button" class="btn2 mt-3" onclick="addCart()"> Thêm vào giỏ hàng</button>
                     </form>
@@ -114,7 +110,8 @@
        
         $('.id_productDetail').val(id_product);
 
-        $('p.price-display').text(`Giá: ${price} VNĐ`);
+        let formattedPrice = price.toLocaleString('vi-VN');
+        $('p.price-display').text(`Giá: ${formattedPrice} VNĐ`);
     }
 
     function urlLoad() {
@@ -129,7 +126,8 @@
 
                 // Cập nhật giá luôn
                 let price = selectedInput.data('price');
-                $('p.price-display').text(`Giá: ${price} VNĐ`);
+                 let formattedPrice = price.toLocaleString('vi-VN');
+                $('p.price-display').text(`Giá: ${formattedPrice} VNĐ`);
 
                 
             }
@@ -137,8 +135,26 @@
     }
 
     function addCart(){
-        let formData= $('#addCart').serialize();
-        console.log(formData);
+        let formData = $('#addCart').serialize();
+    
+        $.ajax({
+        url: "{{ route('user.cart.add') }}", // Laravel route
+        method: 'POST',
+        data: formData,
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+            alert('Đã thêm vào giỏ hàng!');
+            console.log(response);
+        },
+        error: function (xhr) {
+            alert('Lỗi khi thêm vào giỏ hàng!');
+            console.log(xhr.responseText);
+        }
+    });
+        
+    
     }
 </script>
 @endsection

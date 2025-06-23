@@ -29,7 +29,7 @@
                 </div>
                 <div class="col-md-7">
                   <div class="img-box">
-                    <img src="images/slider-img.png" alt="" style="width: 900px;height: 470px;">
+                    <img src="{{ asset('user/images/slider-img.png') }}" alt="" style="width: 900px;height: 470px;">
                   </div>
                 </div>
               </div>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="col-md-7">
                   <div class="img-box">
-                    <img src="images/slider-img1.png" alt="" style="width: 900px;height: 470px;">
+                    <img src=" {{ asset('user/images/slider-img1.png') }}" alt="" style="width: 900px;height: 470px;">
                   </div>
                 </div>
               </div>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="col-md-7">
                   <div class="img-box">
-                    <img src="images/slider-img2.png" alt="" style="width: 900px;height: 470px;">
+                    <img src=" {{ asset('user/images/slider-img2.png') }}" alt="" style="width: 900px;height: 470px;">
                   </div>
                 </div>
               </div>
@@ -123,15 +123,17 @@
         <div class="col-md-6 col-lg-4">
           <div class="box">
             <div class="img-box">
-              <a href="#"><img src="images/f1.png" alt=""></a>
+              <a href="{{ route('user.detailProduct', ['id' => $product->id]) }}"><img src="{{ asset($product->image) }}" alt=""></a>
             </div>
             <div class="detail-box">
               <h5>
-               {{ strlen($product->product_name) > 60 ? substr($product->product_name, 0, 60) . '...' : $product->product_name }}
+                <a href="{{ route('user.detailProduct', ['id' => $product->id]) }}" style="text-decoration: none; color: inherit;"> 
+               {{ strlen($product->product_name) > 50 ? substr($product->product_name, 0, 50) . '...' : $product->product_name }}
+               </a>
               </h5>
               <div class="price_box">
                 <h6 class="price_heading">
-                  <span>$</span> {{ $product->price }}
+                  {{ number_format($product->product_details_min_price, 0, ',', '.') }} <span>VNĐ</span>
                 </h6>
                 <a href="">
                   Buy Now
@@ -163,15 +165,17 @@
         <div class="col-md-6 col-lg-4">
           <div class="box">
             <div class="img-box">
-              <a href="#"><img src="images/f1.png" alt=""></a>
+              <a href="{{ route('user.detailProduct', ['id' => $product->id]) }}"><img src="{{ asset($product->image) }}" alt=""></a>
             </div>
             <div class="detail-box">
               <h5>
-               {{ strlen($product->product_name) > 60 ? substr($product->product_name, 0, 60) . '...' : $product->product_name }}
+                <a href="{{ route('user.detailProduct', ['id' => $product->id]) }}" style="text-decoration: none; color: inherit;"> 
+               {{ strlen($product->product_name) > 50 ? substr($product->product_name, 0, 50) . '...' : $product->product_name }}
+               </a>
               </h5>
               <div class="price_box">
                 <h6 class="price_heading">
-                  <span>$</span> {{ $product->price }}
+                  {{ number_format($product->product_details_min_price, 0, ',', '.') }} <span>VNĐ</span>
                 </h6>
                 <a href="">
                   Buy Now

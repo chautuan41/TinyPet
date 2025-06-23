@@ -31,6 +31,7 @@
   <!-- jQery -->
   <script src="{{ asset('user/js/jquery-3.4.1.min.js') }}"></script>
   
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>

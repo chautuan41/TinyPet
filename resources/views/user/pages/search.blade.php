@@ -17,9 +17,12 @@
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
                         </svg>
                     </span>
-                    <form action="" id="searchForm"></form>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search..." aria-label="Input group example" aria-describedby="basic-addon1">
+                    
+                      <input type="text" id="searchInput" class="form-control" placeholder="Search..." aria-label="Input group example" aria-describedby="basic-addon1">
                         <ul class="dropdown-menu w-100" id="searchDropdown"></ul>
+                   
+                    <form action="" id="searchForm">
+
                     </form>
                 </div>
             </div>
@@ -89,6 +92,15 @@
   <!-- end blog section -->
   <!-- SEARCH-->
 <script>
+     $('#searchInput').on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Ngăn form submit
+            const keyword = this.value.trim();
+            if (keyword) {
+                window.location.href = `/search-result?keyword=${encodeURIComponent(keyword)}`;
+            }
+        }
+    });
 
     $('#searchInput').on('input', function () {
         let query = $(this).val();
@@ -103,7 +115,9 @@
 
                     if (data.length > 0) {
                         data.forEach(item => {
-                            dropdown.append(`<li><a class="dropdown-item" href="#">${item.product_name}</a></li>`);
+                            const baseUrl = "{{ route('user.detailProduct', ['id' => '__ID__']) }}";
+                            let url = baseUrl.replace('__ID__', item.id);
+                            dropdown.append(`<li><a class="dropdown-item" href="${url}">${item.product_name}</a></li>`);
                         });
                         dropdown.show();
                     } else {
@@ -122,6 +136,7 @@
         $('#searchDropdown').hide();
     });
 
-    
+     
+
 </script>
 @endsection
