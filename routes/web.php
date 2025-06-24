@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\VnPayController;
 use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +48,8 @@ Route::group(['middleware' => ['auth']], function(){
 
     
  });
-
+Route::get('/payment', function () {
+    return view('user.pages.payment');
+});
+Route::post('/vnpay/payment', [VnPayController::class, 'createPayment'])->name('vnpay.payment');
+Route::get('/vnpay/return', [VnPayController::class, 'vnpayReturn'])->name('vnpay.return');
