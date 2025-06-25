@@ -68,7 +68,6 @@
                     </div>
                         <input type="hidden" name="id_product" value="{{$data->id}}">
                         <input class="id_productDetail" type="hidden" name="id_productDetail" value="{{$data->id_productDetail}}">
-
                         <button type="button" class="btn2 mt-3" onclick="addCart()"> Thêm vào giỏ hàng</button>
                     </form>
                     
@@ -134,27 +133,6 @@
         }
     }
 
-    function addCart(){
-        let formData = $('#addCart').serialize();
-    
-        $.ajax({
-        url: "{{ route('user.cart.add') }}", // Laravel route
-        method: 'POST',
-        data: formData,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            alert('Đã thêm vào giỏ hàng!');
-            console.log(response);
-        },
-        error: function (xhr) {
-            alert('Lỗi khi thêm vào giỏ hàng!');
-            console.log(xhr.responseText);
-        }
-    });
-        
-    
-    }
+   
 </script>
 @endsection

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\VnPayController;
 use Illuminate\Support\Facades\Auth;
 /*
@@ -28,8 +29,11 @@ Route::get('/search-result',[HomeController::class,'postSearch'])->name('user.se
 Route::get('/product/{id}',[HomeController::class,'detailProduct'])->name('user.detailProduct');
 Route::get('/product',[HomeController::class,'product'])->name('user.product');
 
-Route::get('/cart',[HomeController::class,'cart'])->name('user.cart');
-Route::post('/cart',[HomeController::class,'addCart'])->name('user.cart.add');
+Route::get('/cart',[CartController::class,'cart'])->name('user.cart');
+Route::post('/cart',[CartController::class,'addCart'])->name('user.cart.add');
+Route::get('/clear-cart', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/update-cart', [CartController::class, 'update'])->name('cart.update');
+Route::post('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/checkout',[HomeController::class,'checkout'])->name('user.checkout');
 

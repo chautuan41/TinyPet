@@ -20,7 +20,7 @@ class VnPayController extends Controller
         $vnp_TxnRef = 'ORDER' . now()->format('YmdHis') . rand(1000,9999); // Mã giao dịch
         $vnp_OrderInfo = "Thanh toan GD " . $vnp_TxnRef;
         $vnp_OrderType = "other";
-        $vnp_Amount = $request->amount; // nhân 100 theo yêu cầu
+        $vnp_Amount = $request->amount * 100; // nhân 100 theo yêu cầu
         $vnp_Locale = $request->language ?? 'vn';
         $vnp_BankCode = "NCB";
         $vnp_IpAddr = $request->ip();
@@ -30,7 +30,7 @@ class VnPayController extends Controller
         $inputData = [
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
-            "vnp_Amount" => $vnp_Amount * 100,
+            "vnp_Amount" => $vnp_Amount,
             "vnp_Command" => "pay",
             "vnp_CreateDate" => $vnp_CreateDate,
             "vnp_CurrCode" => "VND",

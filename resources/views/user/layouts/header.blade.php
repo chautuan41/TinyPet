@@ -34,14 +34,14 @@
         </ul>
       </div>
       <div class="quote_btn-container">
-        @auth
         <a href="{{route('user.cart')}}">
+          
           <span>
             Cart
+            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
           </span>
-          <i class="fa fa-user" aria-hidden="true"></i>
+          
         </a>
-        @endauth
         <a href="{{route('user.search')}}">
           <i class="fa fa-search" aria-hidden="true"></i>
         </a>

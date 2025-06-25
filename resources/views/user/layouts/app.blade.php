@@ -43,7 +43,28 @@
 
     @include('user.layouts.footer')
 
-
+  <script>
+    function addCart(){
+        let formData = $('#addCart').serialize();
+    
+        $.ajax({
+          url: "{{ route('user.cart.add') }}", // Laravel route
+          method: 'POST',
+          data: formData,
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function (response) {
+              alert('Đã thêm vào giỏ hàng!');
+              
+          },
+          error: function (xhr) {
+              alert('Lỗi khi thêm vào giỏ hàng!');
+              console.log(xhr.responseText);
+          }
+        });
+    }
+  </script>
   
   <!-- bootstrap js -->
   <script src="{{ asset('user/js/bootstrap.js') }}"></script>
