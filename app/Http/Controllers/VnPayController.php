@@ -67,7 +67,7 @@ class VnPayController extends Controller
         $payment = Payment::create([
             'order_code'     => $vnp_TxnRef,
             'amount'      => $vnp_Amount,
-            'status'      => 'pending', // mặc định là chưa thanh toán
+            'status'      => '1', // mặc định là chưa thanh toán
         ]);
 
         return redirect($paymentUrl);

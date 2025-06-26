@@ -76,11 +76,11 @@
                             <td>{{ strlen($details['name']) > 28 ? substr($details['name'], 0, 28) . '...' : $details['name'] }}</td>
                             <td>{{ $details['size'] }}</td>
                             <td>
-                                <input class="inputQuantity" data-price="{{ $details['price'] }}" data-id="{{ $id }}" type="number" name="quantity" value="{{ $details['quantity'] }}" min="1">
+                                <input class="inputQuantity" data-price="{{ $details['price'] }}" data-id="{{ $id }}" type="number" name="quantity" value="{{ $details['quantity'] }}" min="1" max="{{$details['max']}}">
                             </td>
-                            <td>{{ number_format($details['price'], 0, ',', '.') }}</td>
+                            <td class="price">{{ number_format($details['price'], 0, ',', '.') }}</td>
                             <td class="total">{{ number_format($details['quantity'] * $details['price'], 0, ',', '.') }}</td>
-                            <td><button id="btnRemove" class="btn btn-danger btn-sm" onclick="remove({{ $id }})"><i class="fa fa-trash"></i></button></td>
+                            <td><button id="btnRemove" class="btn btn-danger btn-sm" onclick="remove('{{ $id }}')"><i class="fa fa-trash"></i></button></td>
                         </tr>
                         @php $stt =$stt + 1 ;
                         $total = $total + ($details['price'] * $details['quantity']);
@@ -123,9 +123,7 @@
 <script>
     function updateCart(input) {
         let id = input.data('id');
-        let quantity = parseInt(input.val());
-        let price = parseInt(input.data('price'));
-        
+       
         let formData = {
             id: input.data('id'),
             quantity: parseInt(input.val()),
@@ -141,20 +139,28 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function(response) {
-            let total = quantity * price;
+            
+            
+            if(response.max){
+                input.val(response.quantity);
+            };
+
+            let total = response.quantity * response.price;
+
             input.closest('tr').find('.total').text(total.toLocaleString('vi-VN'));
+            input.closest('tr').find('.price').text(response.price.toLocaleString('vi-VN'));
 
             let sum = 0;
-            $('.inputQuantity').each(function () {
-                let qty = parseInt($(this).val());
-                let prc = parseInt($(this).data('price'));
-                sum += qty * prc;
-            });
 
+            $('.inputQuantity').each(function () {
+                sum += response.quantity * response.price;
+            });
+            
             $('strong#sumTotal').text(sum.toLocaleString('vi-VN'));
         },
         error: function(xhr) {
             alert('Lỗi khi cập nhật vào giỏ hàng!');
+            location.reload();
             console.log(xhr.responseText);
         }
     });
@@ -176,7 +182,6 @@ $('.inputQuantity').on('change', function () {
         enterPressed = false; // Reset lại flag
         return;
     }
-
     updateCart($(this));
 });
 
@@ -197,8 +202,6 @@ function remove(id){
         }
     })
 }
-
-    
 </script>
 <!-- end about section -->
 @endsection

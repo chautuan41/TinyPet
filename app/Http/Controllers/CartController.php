@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\product;
 use App\Models\ProductDetail;
+use Ramsey\Uuid\Type\Integer;
 
 class CartController extends Controller
 {
@@ -17,7 +18,7 @@ class CartController extends Controller
         $validated = $request->validate([
             'id_product' => 'required|exists:products,id',
             'id_productDetail' => 'required|exists:product_details,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => ['required', 'numeric', 'gt:0']
         ]);
 
         if (auth()->check()) {
@@ -33,16 +34,23 @@ class CartController extends Controller
             $idPD = $validated['id_productDetail'];
             $p = Product::findOrFail($idP);
             $pd = ProductDetail::findOrFail($idPD);
-            $cart = session()->get('cart', []);
+            $idCart = "{$idP}_{$idPD}";
 
-            if (isset($cart[$idP + $idPD])) {
-                $cart[$idP + $idPD]['quantity'] = $cart[$idP + $idPD]['quantity'] + (int)$validated['quantity'];
+            $cart = session()->get('cart', []);
+            if (isset($cart[$idCart])) {
+                if((int)$validated['quantity'] + $cart[$idCart]['quantity'] > $cart[$idCart]['max']){
+                    $cart[$idCart]['quantity'] = $cart[$idCart]['max'];
+                }else{
+                    $cart[$idCart]['quantity'] = $cart[$idCart]['quantity'] + (int)$validated['quantity'];
+                }
+                
             } else {
-                $cart[$idP + $idPD] = [
+                $cart[$idCart] = [
                     "name" => $p->product_name,
                     "size" => $pd->size,
-                    "quantity" => (int)$validated['quantity'],
+                    "quantity" => (int)$validated['quantity'] > $pd->quantity ? $pd->quantity : (int)$validated['quantity'],
                     "price" => $pd->price,
+                    "max" => $pd->quantity,
                 ];
             }
 
@@ -63,8 +71,28 @@ class CartController extends Controller
                 ->where('user_id', auth()->id())
                 ->get();
         } else {
-            $data = session()->get('cart', []);
-        }
+            $cart = session()->get('cart', []);
+            $updatedCart = [];
+
+            foreach ($cart as $key => $item) {
+                // Tách key để lấy id_product và id_productDetail
+                [$idProduct, $idProductDetail] = explode('_', $key);
+
+                // Tìm ProductDetail hiện tại
+                $productDetail = ProductDetail::find($idProductDetail);
+
+                if ($productDetail) {
+                    // Cập nhật lại thông tin sản phẩm nếu cần
+                    $item['price'] = $productDetail->price;
+                   
+                }
+
+                $updatedCart[$key] = $item;
+            }
+
+            session()->put('cart', $updatedCart);
+            $data = $updatedCart;
+        };
 
         return view('user.pages.cart', compact('data'));
     }
@@ -81,34 +109,78 @@ class CartController extends Controller
     }
 
     public function update(Request $request)
-    {
-        if (auth()->check()) {
-            $cart = Cart::firstOrNew([
-                'user_id' => auth()->id(),
-                'product_id' => $request->id_product,
-                'product_detail_id' => $request->id_productDetail,
-            ]);
-            $cart->quantity = $request->quantity;
-            $cart->save();
+{
+    $request->validate([
+        'quantity' => ['required', 'numeric', 'gt:0']
+    ]);
 
-            return response()->json([
-                'message' => 'Đã cập nhật vào giỏ hàng',
-            ]);
-        } else {
-            $cart = session()->get('cart');
-            if (isset($cart[$request->id])) {
-                $cart[$request->id]["quantity"] = $request->quantity;
-                session()->put('cart', $cart);
+    if (auth()->check()) {
+        $cart = Cart::firstOrNew([
+            'user_id' => auth()->id(),
+            'product_id' => $request->id_product,
+            'product_detail_id' => $request->id_productDetail,
+        ]);
+
+        $cart->quantity = $request->quantity;
+        $cart->save();
+
+        return response()->json([
+            'message' => 'Đã cập nhật vào giỏ hàng',
+        ]);
+    }
+
+    // Xử lý cho guest (session)
+    $cart = session()->get('cart', []);
+    $key = $request->id; // dạng "productId_productDetailId"
+    $message = '';
+    $max=false;
+    if (isset($cart[$key])) {
+        [$idProduct, $idProductDetail] = explode('_', $key);
+
+        $productDetail = ProductDetail::find($idProductDetail);
+
+        if ($productDetail) {
+            $currentStock = $productDetail->quantity;
+            $productPrice = $productDetail->price;
+
+            // Cập nhật lại giá mới nhất
+            $cart[$key]['price'] = $productPrice;
+            $price[$key] = $productPrice;
+            $maxQty[$key] = $currentStock;
+
+            if ($request->quantity > $currentStock) {
+                $max=true;
+                $cart[$key]['quantity'] = $qty = $currentStock;
+                $message = "Số lượng bạn đặt ({$request->quantity}) vượt quá tồn kho ({$currentStock}). Đã tự động điều chỉnh.";
+            } else {
+                $cart[$key]['quantity'] = $qty = $request->quantity;
+                $message = "Đã cập nhật vào giỏ hàng với số lượng: {$qty}";
             }
 
+            // Cập nhật lại session
+            session()->put('cart', $cart);
+        } else {
             return response()->json([
-                'message' => 'Đã cập nhật vào giỏ hàng',
-            ]);
-        };
+                'message' => 'Sản phẩm không tồn tại.',
+            ], 404);
+        }
+    } else {
+        return response()->json([
+            'message' => 'Sản phẩm không có trong giỏ hàng.',
+        ], 404);
     }
+
+    return response()->json([
+        'message' => $message,
+        'quantity' => $qty,
+        'max' => $max,
+        'price' => $productPrice,
+    ]);
+}
 
     public function remove(Request $request)
     {
+        
         if (auth()->check()) {
             $cart = Cart::find($request->id)
                 ->delete();

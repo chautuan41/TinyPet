@@ -47,7 +47,7 @@
                     <form action="" id="searchForm">
                         <div class="checkbox-group ">
                             @foreach($sizes as $size )
-                            <label><input class="inputSearch" name="inputSearch" type="radio" data-id="{{ $size->id }}" data-price="{{ $size->price }}"  value="{{$size->id}}" {{ $data->size == $size->size ? 'checked' : '' }}> {{ $size->size}}</label><br>
+                            <label><input class="inputSearch" name="inputSearch" type="radio" data-id="{{ $size->id }}" data-price="{{ $size->price }}"  data-quantity="{{ $size->quantity }}" value="{{$size->id}}"  {{ $data->size == $size->size ? 'checked' : '' }}> {{ $size->size}}</label><br>
                             @endforeach
                         </div>
                     </form>
@@ -58,12 +58,12 @@
                     </p>
                    
                     <form action="" id="addCart">
-                         <p>
-                            Số lượng:
+                         <p class="quantity">
+                            Số lượng: {{$data->quantity}}
                         </p>
                     <div class="quantity-selector">
                         <button type="button" onclick="decreaseQty()">−</button>
-                        <input type="number" id="quantity" value="1" min="1" name="quantity">
+                        <input type="number" id="quantity" value="1" min="1" name="quantity" max="{{$data->quantity}}">
                         <button type="button" onclick="increaseQty()">+</button>
                     </div>
                         <input type="hidden" name="id_product" value="{{$data->id}}">
@@ -99,6 +99,7 @@
         });
         let selectedInput = $('input[name="inputSearch"]:checked');
         let price = selectedInput.data('price'); // <-- lấy từ data-price
+        let quantity = selectedInput.data('quantity');
         let id_product = selectedInput.data('id');
 
         let id = @json($data);
@@ -108,7 +109,9 @@
        
        
         $('.id_productDetail').val(id_product);
-
+        $('p.quantity').text(`Số lượng: ${quantity}`);
+        $('#quantity').attr('max', quantity);
+        $('#quantity').val(1);
         let formattedPrice = price.toLocaleString('vi-VN');
         $('p.price-display').text(`Giá: ${formattedPrice} VNĐ`);
     }
@@ -125,10 +128,12 @@
 
                 // Cập nhật giá luôn
                 let price = selectedInput.data('price');
-                 let formattedPrice = price.toLocaleString('vi-VN');
+                let quantity = selectedInput.data('quantity');
+                let formattedPrice = price.toLocaleString('vi-VN');
+                $('p.quantity').text(`Số lượng: ${quantity}`);
                 $('p.price-display').text(`Giá: ${formattedPrice} VNĐ`);
-
-                
+                $('#quantity').attr('max', quantity);
+                $('#quantity').val(1);
             }
         }
     }

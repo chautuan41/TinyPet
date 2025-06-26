@@ -46,7 +46,15 @@ function myMap() {
 
   function increaseQty() {
     var qty = document.getElementById("quantity");
-    qty.value = parseInt(qty.value) + 1;
+    var current = parseInt(qty.value) || 0;
+    var max = parseInt(qty.max); // hoặc: parseInt(qty.getAttribute('max'))
+
+    if (current < max) {
+        qty.value = current + 1;
+    } else {
+        qty.value = max; // giữ nguyên tại max nếu vượt
+        alert("Bạn đã đạt đến số lượng tối đa trong kho!");
+    }
   }
 
   function decreaseQty() {

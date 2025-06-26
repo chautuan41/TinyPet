@@ -36,6 +36,8 @@ Route::post('/update-cart', [CartController::class, 'update'])->name('cart.updat
 Route::post('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/checkout',[HomeController::class,'checkout'])->name('user.checkout');
+Route::post('/vnpay/payment', [VnPayController::class, 'createPayment'])->name('vnpay.payment');
+Route::get('/vnpay/return', [VnPayController::class, 'vnpayReturn'])->name('vnpay.return');
 
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');
@@ -52,8 +54,4 @@ Route::group(['middleware' => ['auth']], function(){
 
     
  });
-Route::get('/payment', function () {
-    return view('user.pages.payment');
-});
-Route::post('/vnpay/payment', [VnPayController::class, 'createPayment'])->name('vnpay.payment');
-Route::get('/vnpay/return', [VnPayController::class, 'vnpayReturn'])->name('vnpay.return');
+

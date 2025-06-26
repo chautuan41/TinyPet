@@ -106,7 +106,7 @@ class HomeController extends Controller
         $data = db::table('products')
             ->join('product_details', 'products.id', '=', 'product_details.product_id')
             ->join('brands', 'products.brand_id', '=', 'brands.id')
-            ->select('products.*', 'product_details.id as id_productDetail', 'product_details.size', 'product_details.price', 'brands.brand_name')
+            ->select('products.*', 'product_details.id as id_productDetail', 'product_details.quantity', 'product_details.size', 'product_details.price', 'brands.brand_name')
             ->where('products.id', $id)
             ->first();
 
@@ -134,10 +134,28 @@ class HomeController extends Controller
 
     function checkout()
     {
-        $carts = cart::with('productDetail', 'product')
-            ->where('user_id', auth()->id())
-            ->get();
+        if (auth()->check()) {
+            $carts = cart::with('productDetail', 'product')
+                ->where('user_id', auth()->id())
+                ->get();
+        } else {
+            $carts = session()->get('cart');
 
+            for($i=0;$i<=10;$i++){
+                for($j=0;$j<=10;$j++){
+                    $product =ProductDetail::where('product_id', $i)
+                    ->select('price')
+                    ->first();
+                    
+                    if ($product) {
+                    $cart[$i + $j]["price"] = $product->price;
+                    };
+                    }
+                }
+            }
+            
+            session()->put('cart', $cart);
+        
         return view('user.pages.checkout', compact('carts'));
     }
 }
