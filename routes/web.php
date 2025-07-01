@@ -5,6 +5,7 @@ use App\Http\Controllers\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\VnPayController;
 use Illuminate\Support\Facades\Auth;
 /*
@@ -35,9 +36,9 @@ Route::get('/clear-cart', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/update-cart', [CartController::class, 'update'])->name('cart.update');
 Route::post('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
 
-Route::get('/checkout',[HomeController::class,'checkout'])->name('user.checkout');
-Route::post('/vnpay/payment', [VnPayController::class, 'createPayment'])->name('vnpay.payment');
-Route::get('/vnpay/return', [VnPayController::class, 'vnpayReturn'])->name('vnpay.return');
+Route::get('/checkout',[CheckoutController::class,'checkout'])->name('user.checkout');
+Route::post('/vnpay/payment', [CheckoutController::class, 'createPayment'])->name('vnpay.payment');
+Route::get('/vnpay/return', [CheckoutController::class, 'vnpayReturn'])->name('vnpay.return');
 
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');

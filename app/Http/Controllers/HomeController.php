@@ -114,6 +114,8 @@ class HomeController extends Controller
             ->where('product_id', $id)
             ->get();
 
+        
+
         return view('user.pages.detailProduct', compact('data', 'sizes', 'images'));
     }
 
@@ -122,6 +124,12 @@ class HomeController extends Controller
     public function product()
     {
         $data = $dtProduct = Product::withMin('productDetails', 'price')
+            ->addSelect([
+                'image' => DB::table('images')
+                    ->select('image_path')
+                    ->whereColumn('product_id', 'products.id')
+                    ->limit(1)
+            ])
             ->where('status', 1)
             ->get();
 
@@ -132,30 +140,5 @@ class HomeController extends Controller
 
     
 
-    function checkout()
-    {
-        if (auth()->check()) {
-            $carts = cart::with('productDetail', 'product')
-                ->where('user_id', auth()->id())
-                ->get();
-        } else {
-            $carts = session()->get('cart');
-
-            for($i=0;$i<=10;$i++){
-                for($j=0;$j<=10;$j++){
-                    $product =ProductDetail::where('product_id', $i)
-                    ->select('price')
-                    ->first();
-                    
-                    if ($product) {
-                    $cart[$i + $j]["price"] = $product->price;
-                    };
-                    }
-                }
-            }
-            
-            session()->put('cart', $cart);
-        
-        return view('user.pages.checkout', compact('carts'));
-    }
+    
 }

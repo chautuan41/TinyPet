@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Admin',
-                'email' => 'admin123@adminpet.com',
+                'email' => 'admin@admin',
                 'email_verified_at' => Carbon::now(),
                 'password' => bcrypt('123456'),
                 'role_id' => 1, 

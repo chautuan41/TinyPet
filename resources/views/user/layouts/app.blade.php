@@ -19,8 +19,7 @@
   <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="{{ asset('user/css/bootstrap.css') }}" />
 
-  <!-- fonts style -->
-  <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet" />
+ 
 
   <!-- font awesome style -->
   <link href="{{ asset('user/css/font-awesome.min.css') }}" rel="stylesheet" />

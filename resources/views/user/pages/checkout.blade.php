@@ -16,15 +16,19 @@
                     <div class="col-md-5 col-lg-4 order-md-last">
                         <h4 class="d-flex justify-content-between align-items-center mb-3"> <span
                                 class="text-primary">Your cart</span> <span
-                                class="badge bg-primary rounded-pill">{{$carts->count()}}</span> </h4>
+                                class="badge bg-primary rounded-pill">{{count($data)}}</span> </h4>
                         <ul class="list-group mb-3">
                             @php
                                 $totalCart = 0;
                             @endphp
-                            @foreach($carts as $cart)
+                            @if(auth()->check())
+                            @foreach($data as $cart)
+                             @if($loop->iteration <= 5)
                             <li class="list-group-item d-flex justify-content-between lh-sm">
+                                 <img src="{{ asset($cart->image) }}" alt="" class="py-1 mr-3" style="with:70px;height:70px">
                                 <div>
-                                    <h6 class="my-0">{{$cart->product->product_name}}</h6> 
+                                   
+                                    <h6 class="my-0"> {{$cart->product->product_name}}</h6> 
                                     <small class="text-body-secondary">Số Lượng: 
                                         {{$cart->quantity}}
                                     </small>
@@ -35,8 +39,62 @@
                                 <span class="text-body-secondary">{{ number_format($cart->productDetail->price, 0, ',', '.') }}</span>
                                 
                             </li>
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                <div>
+                                   <small class="text-body-secondary">
+                                     Thành tiền
+                                    </small>
+                                </div> 
+                                <small class="text-body-secondary">
+                                <span class="text-body-secondary">{{ number_format($cart['price'] * $cart['quantity'], 0, ',', '.') }}</span>
+                                 </small>
+                            </li>
+                           
                             @php
                                 $totalCart = $totalCart + $cart->quantity * $cart->productDetail->price
+                            @endphp
+                            @endif
+                            @endforeach
+                            @if(count($data) > 5)
+                            <li class="list-group-item d-flex justify-content-end"> 
+                            
+                               <em>...</em> </li>
+                            @endif
+                            <li class="list-group-item d-flex justify-content-between"> <span>Total (VND)</span>
+                            
+                                <strong>{{number_format($totalCart, 0, ',', '.')}}</strong> </li>
+                            @else
+                            @foreach($data as $id => $cart)
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                 <img src="{{ asset($cart['image']) }}" alt="" class="py-1 mr-3" style="with:70px;height:70px">
+                                <div>
+                                   
+                                    <h6 class="my-0"> {{$cart['name']}}</h6> 
+                                    <small class="text-body-secondary">Số Lượng: 
+                                        {{$cart['quantity']}}
+                                    </small>
+                                    <small class="text-body-secondary">Trọng Lượng: 
+                                        {{$cart['size']}}
+                                    </small>
+                                    
+                                </div> 
+                                <span class="text-body-secondary">{{ number_format($cart['price'], 0, ',', '.') }}</span>
+                                
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                <div>
+                                   <small class="text-body-secondary">
+                                     Thành tiền
+                                    </small>
+                                </div> 
+                                <small class="text-body-secondary">
+                                <span class="text-body-secondary">{{ number_format($cart['price'] * $cart['quantity'], 0, ',', '.') }}</span>
+                                 </small>
+                            </li>
+                            
+                            
+                            @php
+                                $totalCart = $totalCart + $cart['quantity'] * $cart['price'];
                             @endphp
                                
                             @endforeach
@@ -44,9 +102,8 @@
                             <li class="list-group-item d-flex justify-content-between"> <span>Total (VND)</span>
                             
                                 <strong>{{number_format($totalCart, 0, ',', '.')}}</strong> </li>
-                           
+                            @endif
                         </ul>
-                       
                     </div>
                     <div class="col-md-7 col-lg-8">
                         <h4 class="mb-3">Billing address</h4>
@@ -54,77 +111,38 @@
                             <input type="number" name="amount"  required min="1000" step="1000" value="{{$totalCart}}" hidden>
                             <div class="row g-3">
                                 <div class="col-sm-6"> <label for="firstName" class="form-label">First name</label>
-                                    <input type="text" class="form-control" id="firstName" placeholder="" value=""
+                                    <input type="text" class="form-control" id="firstName" placeholder="" value="{{$info['name'] ?? ''}}" name="name"
                                         required="">
                                     <div class="invalid-feedback">
                                         Valid first name is required.
                                     </div>
                                 </div>
-                                <div class="col-sm-6"> <label for="lastName" class="form-label">Last name</label> <input
-                                        type="text" class="form-control" id="lastName" placeholder="" value=""
+                                <div class="col-sm-6"> <label for="firstName" class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="phone" placeholder="" value="{{$info['phone'] ?? ''}}" name="phone"
                                         required="">
                                     <div class="invalid-feedback">
-                                        Valid last name is required.
-                                    </div>
-                                </div>
-                                <div class="col-12"> <label for="username" class="form-label">Username</label>
-                                    <div class="input-group has-validation"> <span class="input-group-text">@</span>
-                                        <input type="text" class="form-control" id="username" placeholder="Username"
-                                            required="">
-                                        <div class="invalid-feedback">
-                                            Your username is required.
-                                        </div>
+                                        Valid first name is required.
                                     </div>
                                 </div>
                                 <div class="col-12"> <label for="email" class="form-label">Email <span
                                             class="text-body-secondary">(Optional)</span></label> <input type="email"
-                                        class="form-control" id="email" placeholder="you@example.com">
+                                        class="form-control" id="email" placeholder="you@example.com" value="{{$info['email'] ?? ''}}" name="email"> 
                                     <div class="invalid-feedback">
                                         Please enter a valid email address for shipping updates.
                                     </div>
                                 </div>
-                                <div class="col-12"> <label for="address" class="form-label">Address</label> <input
-                                        type="text" class="form-control" id="address" placeholder="1234 Main St"
+                                <div class="col-12"> <label for="address" class="form-label">Address</label> 
+                                        <input type="text" class="form-control" id="address" placeholder="1234 Main St" value="{{$info['address'] ?? ''}}" name="address"
                                         required="">
                                     <div class="invalid-feedback">
                                         Please enter your shipping address.
                                     </div>
                                 </div>
-                                <div class="col-12"> <label for="address2" class="form-label">Address 2 <span
-                                            class="text-body-secondary">(Optional)</span></label> <input type="text"
-                                        class="form-control" id="address2" placeholder="Apartment or suite"> </div>
-                                <div class="col-md-5"> <label for="country" class="form-label">Country</label> <select
-                                        class="form-select" id="country" required="">
-                                        <option value="">Choose...</option>
-                                        <option>United States</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select a valid country.
-                                    </div>
-                                </div>
-                                <div class="col-md-4"> <label for="state" class="form-label">State</label> <select
-                                        class="form-select" id="state" required="">
-                                        <option value="">Choose...</option>
-                                        <option>California</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please provide a valid state.
-                                    </div>
-                                </div>
-                                <div class="col-md-3"> <label for="zip" class="form-label">Zip</label> <input
-                                        type="text" class="form-control" id="zip" placeholder="" required="">
-                                    <div class="invalid-feedback">
-                                        Zip code required.
-                                    </div>
-                                </div>
+                               
+                                
+                                
                             </div>
-                            <hr class="my-4">
-                            <div class="form-check"> <input type="checkbox" class="form-check-input" id="same-address">
-                                <label class="form-check-label" for="same-address">Shipping address is the same as my
-                                    billing address</label> </div>
-                            <div class="form-check"> <input type="checkbox" class="form-check-input" id="save-info">
-                                <label class="form-check-label" for="save-info">Save this information for next
-                                    time</label> </div>
+                            
                             <hr class="my-4">
                             <h4 class="mb-3">Payment</h4>
                             <div class="my-3">
@@ -135,6 +153,12 @@
                                         class="form-check-input" required=""> <label class="form-check-label"
                                         for="debit">Thanh toán khi nhận hàng</label> </div>
                             </div>
+                            @if(!auth()->check())
+                            <hr class="my-4">
+                            <div class="form-check"> <input type="checkbox" class="form-check-input" id="save-info" name="save_info">
+                                <label class="form-check-label" for="save-info">Save this information for next
+                                    time</label> </div>
+                                    @endif
                             <!-- <div class="row gy-3">
                                 <div class="col-md-6"> <label for="cc-name" class="form-label">Name on card</label>
                                     <input type="text" class="form-control" id="cc-name" placeholder="" required="">

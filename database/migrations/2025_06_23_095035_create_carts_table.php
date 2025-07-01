@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('product_detail_id')->nullable(); // ví dụ như size, màu...
             $table->integer('quantity')->default(1);
+            $table->integer('price');
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });

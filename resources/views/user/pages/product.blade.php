@@ -22,7 +22,7 @@
         <div class="col-md-6 col-lg-4">
           <div class="box">
             <div class="img-box">
-              <a href="#"><img src="images/f1.png" alt=""></a>
+              <a href="#"><img src="{{asset($product->image)}}" alt=""></a>
             </div>
             <div class="detail-box">
               <h5>

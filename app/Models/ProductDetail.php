@@ -30,4 +30,9 @@ class ProductDetail extends Model
     {
         return $this->hasMany(Cart::class);
     }
+
+    public function orderDetail()
+    {
+        return $this->belongsTo(orderDetail::class);
+    }
 }
