@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/',[HomeController::class,'index'])->name('user.index');
+Route::get('/data',[HomeController::class,'dataHome'])->name('index.data');
 Route::get('/logout', [AuthController::class,'logout'])->name('logout');
 
 Route::get('/search',[HomeController::class,'search'])->name('user.search');
@@ -43,8 +44,10 @@ Route::get('/vnpay/return', [CheckoutController::class, 'vnpayReturn'])->name('v
 Route::group(['middleware' => ['guest']], function(){
     Route::get('/login', [AuthController::class,'showLogin'])->name('login');
     Route::post('/login', [AuthController::class,'login'])->name('login.post');
-   
+    
 });
+
+
 
 //CUSTOMER
 Route::group(['middleware' => ['auth']], function(){

@@ -51,6 +51,12 @@ class Product extends Model
 
     public function images()
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasMany(Image::class);
     }
+
+    public function firstImage()
+    {
+        return $this->hasOne(Image::class)->oldest(); // hoặc ->limit(1)
+    }
+
 }

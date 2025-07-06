@@ -291,6 +291,80 @@
       </div>
     </div>
   </section>
+<!-- <script>
+  $(document).ready(function () {
+    $.ajax({
+      url: "{{ route('index.data') }}",
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        const routeTemplate = "{{ route('user.detailProduct', ['id' => '__ID__']) }}";
+        let html = '';
+        let html1 = '';
+        data.data.forEach(product => {
+          const url = routeTemplate.replace('__ID__', product.id);
+          html += `
+            <div class="col-md-6 col-lg-4">
+              <div class="box">
+                <div class="img-box">
+                  <a href="${url}">
+                    <img src="/${product.image}" alt="">
+                  </a>
+                </div>
+                <div class="detail-box">
+                  <h5>
+                    <a href="${url}" style="text-decoration: none; color: inherit;">
+                      ${product.product_name.length > 50 ? product.product_name.substring(0, 50) + '...' : product.product_name}
+                    </a>
+                  </h5>
+                  <div class="price_box">
+                    <h6 class="price_heading">
+                      ${Number(product.product_details_min_price).toLocaleString('vi-VN')} <span>VNĐ</span>
+                    </h6>
+                    <a href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
 
+        data.dataNew.forEach(product => {
+          const url = routeTemplate.replace('__ID__', product.id);
+          html1 += `
+            <div class="col-md-6 col-lg-4">
+              <div class="box">
+                <div class="img-box">
+                  <a href="${url}">
+                    <img src="/${product.image}" alt="">
+                  </a>
+                </div>
+                <div class="detail-box">
+                  <h5>
+                    <a href="${url}" style="text-decoration: none; color: inherit;">
+                      ${product.product_name.length > 50 ? product.product_name.substring(0, 50) + '...' : product.product_name}
+                    </a>
+                  </h5>
+                  <div class="price_box">
+                    <h6 class="price_heading">
+                      ${Number(product.product_details_min_price).toLocaleString('vi-VN')} <span>VNĐ</span>
+                    </h6>
+                    <a href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        console.log(html1)
+        $('#productNew-list').html(html1);
+        $('#product-list').html(html);
+      },
+      error: function (xhr, status, error) {
+        console.error('Lỗi gọi sản phẩm:', error);
+      }
+    });
+  });
+</script> -->
   <!-- end blog section -->
 @endsection

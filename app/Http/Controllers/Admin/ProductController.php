@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Product;
+use App\Models\Image;
 class ProductController extends Controller
 {
     //
@@ -13,6 +14,7 @@ class ProductController extends Controller
         $dataC=DB::table('categories')->get();
         $dataPT=DB::table('product_types')->get();
         $dataB=DB::table('brands')->get();
+       
         return view('backend.pages.products.product',compact('dataC','dataPT','dataB'));
         
     }
@@ -226,6 +228,24 @@ class ProductController extends Controller
             ')
         )
         ->get();
+        $product = Product::select('*')
+        ->addSelect([
+            DB::raw("
+                CASE
+                    WHEN status = 1 THEN 'Đang hoạt động'
+                    WHEN status = 2 THEN 'Tạm ngưng hoạt động'
+                END as statusCustom
+            "),
+            'image' => Image::select('image_path')
+                        ->whereColumn('product_id', 'products.id')
+                        ->limit(1)
+        ])
+        ->where('id', $id)
+        ->get();
+        $product1 = Product::with('firstImage')
+        ->where('id', $id)
+        ->get();
+        
         $dataDT = db::table('product_details')
         ->where('product_id',$id)
         ->where('status',1)
@@ -241,7 +261,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'dataDT' => $dataDT,
-            'dataID' => $dataID,
+            'dataID' => $product1,
         ]);
     }
 

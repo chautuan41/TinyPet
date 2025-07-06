@@ -7,6 +7,8 @@
   <title>{{ config('app.name', 'Laravel') }}</title>
   <link rel="shortcut icon" type="image/png" href="{{asset('backend/assets/images/logos/favicon.png')}}" />
   <link rel="stylesheet" href="{{asset('backend/assets/css/styles.min.css')}}" />
+ 
+  
 </head>
 
 <body>
@@ -46,11 +48,14 @@
                     <a class="text-primary fw-bold" href="./index.html">Quên mật khẩu?</a>
                   </div>
                   <button type="button" id='postLogin' class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2" onclick="login(`{{route('login.post')}}`)">Đăng nhập</button>
+                  
+                </form>
+                <button type="button" id="googleLoginBtn" class="btn  w-100 py-8 fs-4 mb-4 rounded-2" >Đăng nhập bằng Google</button>
+                
                   <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">Bạn muốn đăng ký {{ config('app.name', 'Laravel') }}?</p>
                     <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Đăng ký</a>
                   </div>
-                </form>
               </div>
             </div>
           </div>
@@ -64,6 +69,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 <script>
+  
   function login(url){
     let formData = $('#loginForm').serialize();
       $.ajax({
@@ -85,5 +91,60 @@
   }
 
 </script>
+
+ <script type="module">
+    // ✅ Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getAuth, signInWithPopup, signOut, GoogleAuthProvider, FacebookAuthProvider  } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
+    // ✅ Firebase config - thay bằng config của bạn
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFO41spuKSoaEr9Q8pzvGr1UFN4h6x82M",
+        authDomain: "tinypet-7c266.firebaseapp.com",
+        projectId: "tinypet-7c266",
+        storageBucket: "tinypet-7c266.firebasestorage.app",
+        messagingSenderId: "947181491207",
+        appId: "1:947181491207:web:6c11ebf859e0091ef586a2",
+        measurementId: "G-WFZEZ31NP0"
+    };
+
+    // ✅ Init app & auth
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    
+
+    const loginBtn = document.getElementById("googleLoginBtn");
+    
+
+    loginBtn.addEventListener("click", async () => {
+      
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        const idToken = await user.getIdToken();
+
+        console.log("ID token:", idToken);
+
+        // ✅ Gửi token lên Laravel API
+        const res = await fetch("/api/login-firebase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_token: idToken })
+        });
+
+        const data = await res.json();
+        
+        window.location.replace(data.url);
+        
+      } catch (error) {
+        console.error("Lỗi đăng nhập:", error);
+        alert("Đăng nhập thất bại.");
+      }
+    });
+
+    
+  </script>
+
 
 </html>

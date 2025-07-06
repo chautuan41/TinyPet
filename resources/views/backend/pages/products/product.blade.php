@@ -476,7 +476,6 @@
 
     function onView(id) {
         currentEditId = id;
-        console.log(currentEditId);
         let viewUrl = viewBaseUrl.replace('ID_PLACEHOLDER', currentEditId);
         $('#modalView').modal('show');
         $.ajax({
@@ -507,14 +506,28 @@
                     const tbodyID = $('#productID tbody');
                     tbodyID.empty(); // Xoá dữ liệu cũ nếu có
                     result.dataID.forEach(function (item, index) {
+                        switch (item.status) {
+                            case 1:
+                                status = "Đang hoạt động";
+                                option = `mb-0 badge bg-success rounded-3 fw-semibold`;
+                                break;
+                            case 2:
+                                status = "Ngưng hoạt động";
+                                option = `mb-0 badge bg-warning rounded-3 fw-semibold`;
+                                break;
+                            case 3:
+                                status = "Đã bị khóa";
+                                option = `mb-0 badge bg-danger rounded-3 fw-semibold`;
+                                break;
+                        };
                         const row = `
                             <tr>
                                 <td>${item.id}</td>
                                 <td>${item.product_name.length > 20 ? item.product_name.substring(0, 18) + ".." : item.product_name}</td>
-                                <td><img src="{{ asset('backend/assets/images/products/${item.avatar}') }}" alt="Ảnh" width="70" height="70"></td>
+                                <td><img src="{{ asset('${item.first_image.image_path}') }}" alt="Ảnh" width="70" height="70"></td>
                                 <td>${item.created_at ? moment(item.created_at).format('DD/MM/YYYY H:mm') : '-'}</td>
-                                <td>${item.updated_at ? moment(item.updated_at).format('DD/MM/YYYY H:mm') : '-'}</td>   
-                                <td>${item.statusCustom}</td>
+                                <td>${item.updated_at ? moment(item.updated_at).format('DD/MM/YYYY H:mm') : '-'}</td>
+                                <td><h6 class="${option}">${status}</h6></td>
                             </tr>
                         `;
                         tbodyID.append(row);

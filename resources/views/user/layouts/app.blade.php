@@ -43,6 +43,7 @@
     @include('user.layouts.footer')
 
   <script>
+    
     function addCart(){
         let formData = $('#addCart').serialize();
     

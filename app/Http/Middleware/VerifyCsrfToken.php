@@ -15,13 +15,15 @@ class VerifyCsrfToken extends Middleware
      protected $except = [
         '/shopify/products/create',
         'vnpay/payment',
+        'api/login-firebase',
     ];
 
     public function shouldSkipCsrfValidation(Request $request): bool
     {
-        return $request->is(
-            ['shopify/products/create'],
-            ['/vnpay/checkout'],
-        );
+        return $request->is([
+            'shopify/products/create',
+            '/vnpay/checkout',
+            'api/login-firebase',
+        ]);
     }
 }

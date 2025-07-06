@@ -114,11 +114,24 @@
                     dropdown.empty();
 
                     if (data.length > 0) {
-                        data.forEach(item => {
+                        const maxResults = 5;
+
+                        data.slice(0, maxResults).forEach(item => {
                             const baseUrl = "{{ route('user.detailProduct', ['id' => '__ID__']) }}";
-                            let url = baseUrl.replace('__ID__', item.id);
+                            const url = baseUrl.replace('__ID__', item.id);
+
                             dropdown.append(`<li><a class="dropdown-item" href="${url}">${item.product_name}</a></li>`);
                         });
+                        // Nếu có nhiều hơn 5 sản phẩm thì hiển thị nút "Xem thêm"
+                        if (data.length > maxResults) {
+                            dropdown.append(`
+                                <li>
+                                    <a class="dropdown-item text-center text-primary fw-bold" href="/search-result?keyword=${encodeURIComponent(query)}">
+                                        Xem thêm...
+                                    </a>
+                                </li>
+                            `);
+                        }
                         dropdown.show();
                     } else {
                         dropdown.hide();
@@ -132,7 +145,7 @@
 
     // Khi click item
     $('#searchDropdown').on('click', 'a', function () {
-        $('#searchInput').val($(this).text());
+        
         $('#searchDropdown').hide();
     });
 

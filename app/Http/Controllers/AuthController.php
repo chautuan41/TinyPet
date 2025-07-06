@@ -5,10 +5,61 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\User;
+
 class AuthController extends Controller
 {
-    //
+    
    
+    public function loginWithFirebase(Request $request)
+    {
+        $firebase = app('firebase.auth');
+          
+        try {
+        // ✅ Lấy ID token từ phía frontend (JS Firebase)
+        $idToken = $request->input('id_token');
+        
+        if (!$idToken) {
+            return response()->json(['error' => 'Thiếu ID token'], 400);
+        }
+        
+        // ✅ Xác minh ID token
+        $verifiedIdToken = $firebase->verifyIdToken($idToken);
+        
+        $uid = $verifiedIdToken->claims()->get('sub');
+
+        // ✅ Tìm user theo Firebase UID
+        $user = User::where('firebase_uid', $uid)->first();
+
+        if (!$user) {
+            // ✅ Lấy thông tin người dùng từ Firebase
+            $firebaseUser = $firebase->getUser($uid);
+
+            $user = User::create([
+                'name' => $firebaseUser->displayName ?? 'No Name',
+                'email' => $firebaseUser->email ?? ($uid . '@firebase.local'),
+                'firebase_uid' => $uid,
+                'role_id' => 3, // 👈 tuỳ theo hệ thống của bạn
+                'status' => 1,
+                'password' => bcrypt(str()->random(16)), // 👈 mật khẩu ngẫu nhiên
+            ]);
+        }
+
+        
+        // ✅ Đăng nhập vào hệ thống Laravel
+        Auth::login($user);
+
+        return response()->json([
+            'url' => route('user.index'),
+            'message' => 'Đăng nhập thành công!',
+            'user' => $user
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => 'Xác thực thất bại: ' . $e->getMessage()
+        ], 401);
+    }
+    }
 
     public function showLogin()
     {
@@ -72,4 +123,6 @@ class AuthController extends Controller
         Auth::logout();
         return redirect()->route('user.index');
     }
+
+   
 }

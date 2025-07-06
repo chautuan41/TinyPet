@@ -66,6 +66,36 @@ class HomeController extends Controller
         return view('user.pages.home', compact('dtNewProduct', 'dtProduct'));
     }
 
+    // function dataHome(){
+    //     $dtProduct = Product::withMin('productDetails', 'price')
+    //         ->addSelect([
+    //             'image' => DB::table('images')
+    //                 ->select('image_path')
+    //                 ->whereColumn('product_id', 'products.id')
+    //                 ->limit(1)
+    //         ])
+    //         ->where('status', 1)
+    //         ->limit(6)
+    //         ->get();
+
+    //         $dtNewProduct = Product::withMin('productDetails', 'price')
+    //     ->addSelect([
+    //         'image' => DB::table('images')
+    //             ->select('image_path')
+    //             ->whereColumn('product_id', 'products.id')
+    //             ->limit(1)
+    //     ])
+    //     ->where('status', 1)
+    //     ->orderBy('updated_at', 'desc')
+    //     ->limit(6)
+    //     ->get();
+
+    //     return response()->json([
+    //         'data' =>$dtProduct,
+    //         'dataNew' =>$dtNewProduct,
+    //     ]);
+    // }
+
     public function search()
     {
         return view('user.pages.search');
@@ -78,9 +108,8 @@ class HomeController extends Controller
 
         $data = db::table('products')
             ->where('product_name', 'like', '%' . $request->input('query') . '%')
-            ->limit(5)
             ->get();
-
+        
         return response()->json($data);
     }
     public function postSearch(Request $request)
@@ -94,7 +123,6 @@ class HomeController extends Controller
         $data = Product::withMin('productDetails', 'price')
             ->where('product_name', 'like', '%' . $keyword . '%')
             ->get();
-
         return view('user.pages.product', compact('data', 'keyword'));
     }
 
